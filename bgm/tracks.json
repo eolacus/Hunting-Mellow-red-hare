@@ -1,0 +1,34 @@
+[
+  {
+    "file": "arrive.mp3",
+    "name": "입장 - 정원의 오르골"
+  },
+  {
+    "file": "opening.mp3",
+    "name": "오프닝 - 토끼굴"
+  },
+  {
+    "file": "act1.mp3",
+    "name": "1막 - 다과회"
+  },
+  {
+    "file": "event.mp3",
+    "name": "이벤트 - 시간의 비밀"
+  },
+  {
+    "file": "act2.mp3",
+    "name": "2막 - 오래된 기억"
+  },
+  {
+    "file": "trial.mp3",
+    "name": "재판 - 긴장"
+  },
+  {
+    "file": "ending.mp3",
+    "name": "결말 - 자정의 종"
+  },
+  {
+    "file": "party.mp3",
+    "name": "파티"
+  }
+]

@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>진행자 패널 - Hunting Mellow Red Hare</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@400;500;600;700;800&family=East+Sea+Dokdo&family=Pinyon+Script&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0708; --card:#170a0c; --ink:#eadfcd; --mute:#a8998a; --gold:#c9a45c; --gold2:#e6c98a; --red:#b31b2b; --red2:#e0414f; --line:rgba(201,164,92,.28); --ok:#5fb877}
+*{box-sizing:border-box}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:'Hahmlet',serif; font-size:15px; line-height:1.6}
+header{position:sticky; top:0; z-index:10; display:flex; align-items:center; gap:14px; flex-wrap:wrap; padding:10px 16px; background:rgba(13,7,8,.96); border-bottom:1px solid var(--line)}
+.brand{font-family:'Pinyon Script',cursive; color:var(--gold2); font-size:22px}
+.pill{padding:3px 10px; border:1px solid var(--line); border-radius:20px; font-size:13px; color:var(--mute)} .pill b{color:var(--gold2)}
+.pill.on{border-color:var(--ok); color:var(--ok)} .pill.off{border-color:var(--red2); color:var(--red2)}
+main{display:grid; grid-template-columns:repeat(auto-fit, minmax(340px, 1fr)); gap:14px; padding:14px 16px 60px; max-width:1500px; margin:0 auto}
+section{background:var(--card); border:1px solid var(--line); border-radius:8px; padding:14px 14px 12px; min-width:0}
+section.wide{grid-column:1 / -1}
+h2{font-family:'Hahmlet',serif; font-size:16px; color:var(--gold2); margin:0 0 10px; letter-spacing:1px; display:flex; justify-content:space-between; align-items:center; gap:8px}
+h2 small{font-family:'Hahmlet',serif; color:var(--mute); font-size:12px; letter-spacing:0}
+button{font:inherit; font-size:13.5px; padding:7px 12px; border-radius:5px; border:1px solid var(--line); background:#24100f; color:var(--ink); cursor:pointer}
+button:hover{border-color:var(--gold)} button.pri{background:var(--red); border-color:var(--red); color:#fff} button.on{background:#3a2a10; border-color:var(--gold); color:var(--gold2)}
+button.danger{border-color:#7a2a2a; color:#ff8a8a}
+input, select, textarea{font:inherit; font-size:14px; background:#0a0405; color:var(--ink); border:1px solid #4a3020; border-radius:5px; padding:6px 8px}
+textarea{width:100%; min-height:64px; resize:vertical}
+.row{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:6px 0}
+.big{font-family:'Hahmlet',serif; font-weight:800; font-size:22px; color:var(--ink)}
+.muted{color:var(--mute); font-size:13px}
+.phases{display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; margin:10px 0}
+.phases button{padding:8px 4px; font-size:12.5px}
+.tt{width:100%; border-collapse:collapse; font-size:13.5px}
+.tt td{padding:5px 4px; border-bottom:1px solid rgba(201,164,92,.12); vertical-align:middle}
+.tt td:first-child{color:var(--gold2); white-space:nowrap} .tt tr.cur td{background:rgba(179,27,43,.15)}
+.tt select{max-width:150px} .tt input[type=time]{width:96px}
+.stats{display:flex; gap:14px; flex-wrap:wrap; font-size:13px; color:var(--mute); margin-bottom:8px} .stats b{color:var(--ink); font-size:15px}
+.grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:8px}
+.pc{position:relative; padding:9px 10px 8px; border:1px solid rgba(201,164,92,.18); border-radius:6px; background:#120708; cursor:pointer}
+.pc:hover{border-color:var(--gold)} .pc.offline{opacity:.5}
+.pc .nm{font-weight:700; font-size:14.5px} .pc .nm .s{margin-right:4px} .pc .nm .s.red{color:var(--red2)}
+.pc .cur{font-size:12.5px; color:var(--gold2)} .pc .meta{font-size:11.5px; color:var(--mute)}
+.pc .od{position:absolute; top:10px; right:10px; width:8px; height:8px; border-radius:50%; background:#555} .pc .od.on{background:var(--ok)}
+.dots{display:flex; gap:3px; margin:5px 0 3px} .dots i{width:16px; height:5px; border-radius:2px; background:rgba(255,255,255,.1)} .dots i.y{background:var(--red2)}
+.filter button{padding:4px 10px; font-size:12.5px}
+.sheet{position:fixed; inset:0; z-index:30; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,.6); padding:16px}
+.sheet .sb{width:100%; max-width:420px; background:var(--card); border:1px solid var(--gold); border-radius:8px; padding:16px}
+.sheet h3{font-family:'Hahmlet',serif; margin:0 0 4px; color:var(--gold2)}
+.sheet .row button{flex:1}
+ul.ans{margin:0; padding-left:18px; font-size:13.5px} ul.ans li{margin:3px 0}
+.log{max-height:160px; overflow:auto; font-size:12.5px; color:var(--mute)}
+.mem{display:flex; justify-content:space-between; gap:8px; font-size:13.5px; padding:3px 0; border-bottom:1px dashed rgba(201,164,92,.12)} .mem b{color:var(--red2)}
+.toast{position:fixed; left:50%; bottom:18px; transform:translateX(-50%); z-index:40; background:#2a1210; border:1px solid var(--gold); padding:8px 16px; border-radius:6px; font-size:14px}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">Red Hare · 진행자 패널</div>
+  <span class="pill">지금 <b id="hClock">--:--</b></span>
+  <span class="pill">단계 <b id="hPhase">-</b></span>
+  <span class="pill" id="hNext"></span>
+  <span class="pill" id="hStage">무대 화면</span>
+  <span class="pill" id="hMode"></span>
+</header>
+<main>
+  <section>
+    <h2>진행 단계 <small id="autoLbl"></small></h2>
+    <div class="big" id="phaseBig">-</div>
+    <div class="muted" id="phaseSince"></div>
+    <div class="phases" id="phaseBtns"></div>
+    <div class="row"><button id="prevP">◂ 이전 단계</button><button class="pri" id="nextP">다음 단계 ▸</button><button id="autoBtn"></button></div>
+    <div class="muted">자동 진행을 켜 두면 타임테이블 시각에 맞춰 단계가 앞으로만 넘어갑니다. 결말과 자유 파티는 기본으로 수동입니다.</div>
+  </section>
+
+  <section>
+    <h2>무대 화면 <small id="stageNow"></small></h2>
+    <div class="row"><span class="muted">오프닝 페이지</span><button id="opPrev">◂</button><b id="opNum">1 / 3</b><button id="opNext">▸</button></div>
+    <div class="row"><button id="spellBtn">주문 다시 크게 띄우기</button><button id="endingBtn">엔딩 연출 시작 (12시 · 종 6번)</button></div>
+    <div class="muted" style="margin-top:6px">무대에 크게 띄울 말</div>
+    <textarea id="stageText" placeholder="예: 회중시계를 찾은 가문이 나왔습니다!"></textarea>
+    <div class="row"><button class="pri" id="stageSend">무대에 띄우기 (20초)</button><button id="stageClear">지우기</button></div>
+  </section>
+
+  <section>
+    <h2>BGM <small id="bgmNow"></small></h2>
+    <div class="row"><button id="bgmPlay"></button><span class="muted">볼륨</span><input type="range" id="vol" min="0" max="1" step="0.05" style="flex:1"></div>
+    <div class="row"><select id="ovr" style="flex:1"></select><button id="ovrBtn">지금 이 곡 틀기</button></div>
+    <div class="row"><button id="ovrOff">타임테이블대로 돌아가기</button></div>
+    <div class="muted">음악 파일은 사이트의 bgm 폴더에 올리고 bgm/tracks.json에 이름을 적어 두세요. 소리는 무대 화면(TV)에서만 나옵니다.</div>
+  </section>
+
+  <section class="wide">
+    <h2>타임테이블 <small>시각을 바꾸면 바로 저장됩니다</small></h2>
+    <table class="tt" id="tt"></table>
+    <div class="row"><button id="shiftP">아직 안 온 일정 5분 미루기</button><button id="shiftM">5분 당기기</button></div>
+  </section>
+
+  <section class="wide">
+    <h2>참석자 <small>카드를 누르면 메시지 · 문 열어주기 · 초기화</small></h2>
+    <div class="stats" id="pStats"></div>
+    <div class="row filter" id="pFilter"></div>
+    <div class="grid" id="pGrid"></div>
+  </section>
+
+  <section>
+    <h2>전체 공지 <small>참석자 화면 위에 뜹니다</small></h2>
+    <textarea id="bcText" placeholder="예: 20:50, 재판까지 10분 남았습니다. 가문끼리 모여 답을 정해 주세요."></textarea>
+    <div class="row"><select id="bcTo"><option value="all">모두에게</option><option value="spade">♠ 스페이드</option><option value="heart">♥ 하트</option><option value="clover">♣ 클로버</option><option value="diamond">♦ 다이아</option></select><button class="pri" id="bcSend">보내기</button></div>
+  </section>
+
+  <section>
+    <h2>망자의 기억 판매 <small id="npcOn"></small></h2>
+    <div id="npcSum"></div>
+    <div class="log" id="npcLog"></div>
+  </section>
+
+  <section>
+    <h2>정답지 <button id="ansT">펼치기</button></h2>
+    <div id="ans" hidden></div>
+  </section>
+
+  <section>
+    <h2>도구</h2>
+    <div class="row"><a href="stage.html" target="_blank"><button>무대 화면 열기</button></a><a href="npc.html" target="_blank"><button>NPC 화면 열기</button></a><a href="index.html" target="_blank"><button>참석자 화면 열기</button></a></div>
+    <div class="row"><button class="danger" id="wipe">게임 기록 초기화 (리허설 후)</button></div>
+    <div class="muted">참석자 명단, 진행 기록, 망자 판매 기록, 공지를 지우고 단계를 "입장"으로 되돌립니다. 타임테이블과 BGM 설정은 남습니다.</div>
+  </section>
+</main>
+<script type="module">
+import { connect, login, LOGIN_CSS, PHASES, PHASE_NAME, HOUSES, TITLES, pIdx, atToday, autoAdvance, nextEntry, fmtClock, fmtLeft, esc } from './net.js';
+document.head.append(Object.assign(document.createElement('style'), {textContent: LOGIN_CSS}));
+const $ = s => document.querySelector(s);
+const N = await connect();
+await login(N, 'host', '진행자 패널');
+$('#hMode').textContent = N.mode === 'firebase' ? '실시간 서버 연결' : '연습 모드 (이 기기 안에서만)';
+$('#hMode').className = 'pill ' + (N.mode === 'firebase' ? 'on' : 'off');
+
+let st = {}, cfg = {}, players = {}, host = {}, npc = {}, npcdata = {}, tracks = [], stage = {}, filter = 'all';
+try{ tracks = await (await fetch('bgm/tracks.json', {cache:'no-store'})).json(); }catch(e){}
+const toast = t => { const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.append(d); setTimeout(() => d.remove(), 2200); };
+const setState = o => N.update('state', o);
+const CH_ORDER = ['c2','c3','c4','c5','c6','c7','c8'];
+
+// ---------- phase ----------
+function goPhase(p){ setState({ phase: p, phaseAt: N.now(), stageScene: '', showSpell: false }); toast(PHASE_NAME[p] + '(으)로 넘겼습니다'); }
+$('#phaseBtns').innerHTML = PHASES.map(p => `<button data-p="${p}">${PHASE_NAME[p].split(' - ')[0]}</button>`).join('');
+$('#phaseBtns').onclick = e => { const p = e.target.dataset.p; if(p && confirm(PHASE_NAME[p] + ' 단계로 바꿀까요?')) goPhase(p); };
+$('#prevP').onclick = () => { const i = pIdx(st.phase); if(i > 0 && confirm('이전 단계로 되돌릴까요? 자동 진행이 켜져 있으면 시각이 지난 단계로 다시 넘어갈 수 있어요.')) goPhase(PHASES[i - 1]); };
+$('#nextP').onclick = () => { const i = pIdx(st.phase); if(i < PHASES.length - 1) goPhase(PHASES[i + 1]); };
+$('#autoBtn').onclick = () => setState({ auto: st.auto === false });
+function renderPhase(){
+  const p = st.phase || 'arrive';
+  $('#hPhase').textContent = PHASE_NAME[p]; $('#phaseBig').textContent = PHASE_NAME[p];
+  $('#phaseSince').textContent = st.phaseAt ? fmtClock(st.phaseAt) + '부터' : '';
+  document.querySelectorAll('#phaseBtns button').forEach(b => b.classList.toggle('on', b.dataset.p === p));
+  $('#autoBtn').textContent = st.auto === false ? '자동 진행 꺼짐' : '자동 진행 켜짐'; $('#autoBtn').classList.toggle('on', st.auto !== false);
+  $('#autoLbl').textContent = st.auto === false ? '수동' : '타임테이블 자동';
+  $('#spellBtn').classList.toggle('on', !!st.showSpell); $('#spellBtn').textContent = st.showSpell ? '주문 크게 띄우는 중 (끄기)' : '주문 다시 크게 띄우기';
+  $('#endingBtn').classList.toggle('on', st.stageScene === 'ending');
+  $('#opNum').textContent = ((st.openingPage || 0) + 1) + ' / 3';
+  $('#bgmPlay').textContent = st.bgmPlaying === false ? '▶ 음악 켜기' : '⏸ 음악 끄기';
+}
+
+// ---------- stage ----------
+$('#opPrev').onclick = () => setState({ openingPage: Math.max(0, (st.openingPage || 0) - 1) });
+$('#opNext').onclick = () => setState({ openingPage: Math.min(2, (st.openingPage || 0) + 1) });
+$('#spellBtn').onclick = () => setState({ showSpell: !st.showSpell });
+$('#endingBtn').onclick = () => { if(st.phase !== 'end'){ if(!confirm('결말 단계로 넘기고 엔딩 연출을 시작할까요?')) return; setState({ phase: 'end', phaseAt: N.now(), stageScene: 'ending' }); } else setState({ stageScene: st.stageScene === 'ending' ? '' : 'ending' }); };
+$('#stageSend').onclick = () => { const t = $('#stageText').value.trim(); if(!t) return; setState({ stageMsg: { text: t, at: N.now() } }); toast('무대에 띄웠습니다'); };
+$('#stageClear').onclick = () => setState({ stageMsg: null });
+
+// ---------- bgm ----------
+const trackName = f => (tracks.find(t => t.file === f) || {}).name || f || '없음';
+function fillTracks(sel, val, none){ sel.innerHTML = `<option value="">${none}</option>` + tracks.map(t => `<option value="${esc(t.file)}">${esc(t.name)}</option>`).join(''); sel.value = val || ''; }
+$('#bgmPlay').onclick = () => setState({ bgmPlaying: st.bgmPlaying === false });
+$('#vol').oninput = e => N.update('config', { volume: Number(e.target.value) });
+$('#ovrBtn').onclick = () => { N.update('config', { bgmOverride: $('#ovr').value }); toast('무대에서 ' + trackName($('#ovr').value) + ' 재생'); };
+$('#ovrOff').onclick = () => { N.update('config', { bgmOverride: '' }); toast('타임테이블 BGM으로 돌아갑니다'); };
+function renderBgm(){
+  const seg = (cfg.schedule || {})[st.phase] || {};
+  const want = cfg.bgmOverride || seg.bgm || '';
+  $('#bgmNow').textContent = (st.bgmPlaying === false ? '멈춤 · ' : '') + (cfg.bgmOverride ? '직접 고른 곡: ' : '일정: ') + trackName(want);
+  if(document.activeElement !== $('#vol')) $('#vol').value = cfg.volume ?? .7;
+  if(document.activeElement !== $('#ovr')) fillTracks($('#ovr'), cfg.bgmOverride, '곡 고르기');
+}
+
+// ---------- timetable ----------
+function renderTT(){
+  const S = cfg.schedule || {};
+  const rows = PHASES.filter(p => S[p]).map(p => { const e = S[p];
+    return `<tr class="${p === st.phase ? 'cur' : ''}" data-p="${p}"><td>${esc(e.label || PHASE_NAME[p])}</td>
+      <td><input type="time" value="${esc(e.time)}" data-k="time"></td>
+      <td><label class="muted"><input type="checkbox" data-k="auto" ${e.auto ? 'checked' : ''}> 자동</label></td>
+      <td><select data-k="bgm"></select></td></tr>`; }).join('');
+  if(document.activeElement && $('#tt').contains(document.activeElement)) return;
+  $('#tt').innerHTML = '<tr><td class="muted">단계</td><td class="muted">시작</td><td class="muted">자동</td><td class="muted">BGM</td></tr>' + rows;
+  $('#tt').querySelectorAll('tr[data-p]').forEach(tr => fillTracks(tr.querySelector('select'), S[tr.dataset.p].bgm, '음악 없음'));
+}
+$('#tt').onchange = e => { const tr = e.target.closest('tr'); if(!tr) return; const k = e.target.dataset.k;
+  const v = k === 'auto' ? e.target.checked : e.target.value; N.update('config/schedule/' + tr.dataset.p, { [k]: v }); toast('저장했습니다'); };
+const shift = d => { const now = N.now(), S = cfg.schedule || {}, up = {};
+  for(const [p, e] of Object.entries(S)){ const t = atToday(e.time, now); if(t > now){ const n = new Date(t + d * 60e3); up[p + '/time'] = String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0'); } }
+  if(Object.keys(up).length){ N.update('config/schedule', up); toast('아직 안 온 일정을 ' + (d > 0 ? d + '분 미뤘습니다' : (-d) + '분 당겼습니다')); } };
+$('#shiftP').onclick = () => shift(5); $('#shiftM').onclick = () => shift(-5);
+
+// ---------- players ----------
+const has = (p, ch) => (p.opened || '').split(',').includes(ch);
+const ago = t => { if(!t) return ''; const m = Math.round((N.now() - t) / 60000); return m < 1 ? '방금' : m + '분 전'; };
+$('#pFilter').innerHTML = [['all','전체'], ...HOUSES.map(h => [h.k, h.s + ' ' + h.n]), ['none','가문 없음']].map(([k, l]) => `<button data-f="${k}">${l}</button>`).join('');
+$('#pFilter').onclick = e => { if(e.target.dataset.f){ filter = e.target.dataset.f; renderPlayers(); } };
+function renderPlayers(){
+  const all = Object.entries(players).filter(([, p]) => p && p.name);
+  const on = all.filter(([, p]) => p.online).length;
+  const chCount = ch => all.filter(([, p]) => has(p, ch)).length;
+  $('#pStats').innerHTML = `<span>접속 <b>${on}</b> / ${all.length}명</span>` + HOUSES.map(h => `<span>${h.s} <b>${all.filter(([, p]) => p.house === h.k).length}</b></span>`).join('')
+    + `<span>첫 문 통과 <b>${chCount('c2')}</b></span><span>시계 자리 <b>${chCount('c4')}</b></span><span>시간의 비밀 <b>${chCount('c5')}</b></span><span>2막 <b>${chCount('c6')}</b></span><span>재판 <b>${chCount('c7')}</b></span><span>자정 <b>${chCount('c8')}</b></span>`;
+  document.querySelectorAll('#pFilter button').forEach(b => b.classList.toggle('on', b.dataset.f === filter));
+  const list = all.filter(([, p]) => filter === 'all' || (filter === 'none' ? !p.house : p.house === filter))
+    .sort((a, b) => (a[1].house || 'z').localeCompare(b[1].house || 'z') || a[1].name.localeCompare(b[1].name));
+  $('#pGrid').innerHTML = list.map(([id, p]) => { const h = HOUSES.find(x => x.k === p.house);
+    return `<div class="pc ${p.online ? '' : 'offline'}" data-id="${id}"><span class="od ${p.online ? 'on' : ''}"></span>
+      <div class="nm">${h ? `<span class="s ${h.red ? 'red' : ''}">${h.s}</span>` : '<span class="s">·</span>'}${esc(p.name)}</div>
+      <div class="cur">${esc(TITLES[p.cur] || p.cur || '')}</div>
+      <div class="dots">${CH_ORDER.map(c => `<i class="${has(p, c) ? 'y' : ''}" title="${TITLES[c]}"></i>`).join('')}</div>
+      <div class="meta">기억 ${p.ghosts || 0} · 인장 ${p.seals || 0} · ${ago(p.at)}</div></div>`; }).join('') || '<div class="muted">아직 들어온 손님이 없습니다.</div>';
+}
+$('#pGrid').onclick = e => { const c = e.target.closest('.pc'); if(c) sheet(c.dataset.id); };
+function sheet(id){
+  const p = players[id]; if(!p) return; const h = HOUSES.find(x => x.k === p.house);
+  const d = document.createElement('div'); d.className = 'sheet';
+  const next = CH_ORDER.find(c => !has(p, c));
+  d.innerHTML = `<div class="sb"><h3>${h ? h.s + ' ' : ''}${esc(p.name)}</h3><div class="muted">${p.online ? '접속 중' : '접속 끊김'} · 지금 ${esc(TITLES[p.cur] || '')}</div>
+    <textarea placeholder="이 손님에게만 보낼 메시지"></textarea><div class="row"><button class="pri" data-a="msg">메시지 보내기</button></div>
+    <div class="row"><select>${CH_ORDER.map(c => `<option value="${c}" ${c === next ? 'selected' : ''}>${TITLES[c]}${has(p, c) ? ' (열림)' : ''}</option>`).join('')}</select><button data-a="unlock">이 문 열어주기</button></div>
+    <div class="row"><button class="danger" data-a="reset">이 손님 화면 초기화</button><button class="danger" data-a="del">명단에서 지우기</button></div>
+    <div class="row"><button data-a="close">닫기</button></div></div>`;
+  document.body.append(d);
+  d.onclick = async e => { const a = e.target.dataset.a; if(e.target === d || a === 'close') return d.remove(); if(!a) return;
+    const box = 'players/' + id + '/inbox';
+    if(a === 'msg'){ const t = d.querySelector('textarea').value.trim(); if(!t) return; await N.push(box, { type: 'msg', text: t, at: N.now() }); toast('보냈습니다'); d.remove(); }
+    if(a === 'unlock'){ const ch = d.querySelector('select').value, key = (host.keys || {})[ch]; if(!key) return toast('정답 데이터가 없습니다');
+      await N.push(box, { type: 'unlock', ch, key, at: N.now() }); toast(TITLES[ch] + ' 문을 열어 주었습니다'); d.remove(); }
+    if(a === 'reset' && confirm(p.name + '님의 화면을 처음 상태로 되돌릴까요? 가문 선택과 열린 문이 모두 사라집니다.')){ await N.push(box, { type: 'reset', at: N.now() }); toast('초기화했습니다'); d.remove(); }
+    if(a === 'del' && confirm('명단에서 지울까요? (그 손님이 다시 움직이면 다시 나타납니다)')){ await N.remove('players/' + id); d.remove(); } };
+}
+
+// ---------- broadcast ----------
+$('#bcSend').onclick = async () => { const t = $('#bcText').value.trim(); if(!t) return;
+  await N.set('broadcast', { text: t, to: $('#bcTo').value, at: N.now() }); $('#bcText').value = ''; toast('공지를 보냈습니다'); };
+
+// ---------- npc sales ----------
+function renderNpc(){
+  const parts = [], log = [];
+  for(const g of ['cat', 'hatter']){ const d = npcdata[g] || {}, sales = Object.values((npc[g] || {}).sales || {});
+    parts.push(`<div style="margin-bottom:8px"><b style="color:var(--gold2)">${esc(d.name || g)}</b> <span class="muted">${(npc[g] || {}).online ? '· 접속 중' : '· 미접속'} · 받은 은화 ${sales.length * 3}닢</span>
+      ${(d.mems || []).map((m, i) => { const ss = sales.filter(s => s.mem === i);
+        return `<div class="mem"><span>${i + 1}. ${esc(m.title)} <span class="muted">(${esc(m.word)})</span></span><span>${HOUSES.map(h => h.s + (ss.filter(s => s.house === h.k).length)).join(' ')} · <b>${ss.length}</b></span></div>`; }).join('')}</div>`);
+    sales.forEach(s => log.push([s.at, `${fmtClock(s.at)} ${esc(d.name || g)} → ${(HOUSES.find(h => h.k === s.house) || {}).s || ''} ${esc((d.mems || [])[s.mem]?.title || '')}`])); }
+  $('#npcSum').innerHTML = parts.join(''); $('#npcLog').innerHTML = log.sort((a, b) => b[0] - a[0]).map(x => x[1]).join('<br>');
+}
+
+// ---------- answers ----------
+$('#ansT').onclick = () => { const a = $('#ans'); a.hidden = !a.hidden; $('#ansT').textContent = a.hidden ? '펼치기' : '접기'; };
+function renderAns(){
+  const k = host.keys || {}, s = host.seals || {};
+  $('#ans').innerHTML = `<ul class="ans">${(host.answers || []).map(x => `<li>${esc(x)}</li>`).join('')}
+    <li>주문: 시간의 비밀 "${esc(k.c5)}" / 2막 "${esc(k.c6)}" / 재판 "${esc(k.c7)}" / 엔딩 "${esc(k.c8)}"</li>
+    <li>인장: ${HOUSES.map(h => h.s + ' ' + esc(s[h.k] || '')).join(' / ')}</li></ul>`;
+}
+
+// ---------- tools ----------
+$('#wipe').onclick = async () => { if(!confirm('게임 기록을 모두 지울까요? (참석자 명단, 진행, 판매 기록, 공지)')) return;
+  await Promise.all(['players', 'npc', 'broadcast'].map(p => N.remove(p)));
+  await N.update('state', { phase: 'arrive', phaseAt: N.now(), stageScene: '', showSpell: false, stageMsg: null, openingPage: 0 }); toast('초기화했습니다'); };
+
+// ---------- live ----------
+function tick(){ const now = N.now(); $('#hClock').textContent = fmtClock(now); const nx = nextEntry(cfg.schedule, now, st.phase);
+  $('#hNext').innerHTML = nx ? `다음 <b>${esc(nx.label)}</b> ${fmtLeft(nx.t - now)}` : '다음 일정 없음'; }
+const all = () => { renderPhase(); renderBgm(); renderTT(); renderPlayers(); renderNpc(); };
+N.on('state', v => { st = v || {}; all(); });
+N.on('config', v => { cfg = v || {}; all(); });
+N.on('players', v => { players = v || {}; renderPlayers(); });
+N.on('npc', v => { npc = v || {}; renderNpc(); });
+N.on('npcdata', v => { npcdata = v || {}; renderNpc(); });
+N.on('hostdata', v => { host = v || {}; renderAns(); });
+N.on('stage', v => { stage = v || {}; $('#hStage').textContent = stage.online ? '무대 화면 연결됨' : '무대 화면 꺼짐'; $('#hStage').className = 'pill ' + (stage.online ? 'on' : 'off');
+  $('#stageNow').textContent = stage.nowPlaying ? '재생 중: ' + trackName(stage.nowPlaying) : ''; });
+autoAdvance(N, () => st, () => cfg);
+setInterval(tick, 1000); tick(); setInterval(renderPlayers, 30000);
+</script>
+</body>
+</html>

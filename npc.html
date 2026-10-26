@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>망자 - Hunting Mellow Red Hare</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@400;500;600;700;800&family=East+Sea+Dokdo&family=Pinyon+Script&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0708; --ink:#eadfcd; --mute:#a8998a; --gold:#c9a45c; --gold2:#e6c98a; --red:#b31b2b; --red2:#e0414f; --ok:#5fb877}
+*{box-sizing:border-box}
+body{margin:0; min-height:100vh; background:radial-gradient(ellipse at 50% 0%, #1d2a2c 0%, #0b0708 60%); color:var(--ink); font-family:'Hahmlet',serif; font-size:16px; line-height:1.75}
+.wrap{max-width:520px; margin:0 auto; padding:18px 16px 60px}
+.k{font-family:'Pinyon Script',cursive; color:var(--gold2); font-size:22px; text-align:center}
+h1{font-family:'Hahmlet',serif; font-weight:800; font-size:24px; text-align:center; margin:2px 0 4px}
+.desc{color:var(--mute); font-size:14px; text-align:center; margin:0 0 12px}
+.status{text-align:center; padding:10px; margin:10px 0 14px; border-top:1px solid rgba(201,164,92,.4); border-bottom:1px solid rgba(201,164,92,.4); font-size:15px}
+.status.open{color:#9fe0b0} .status.wait{color:var(--gold2)} .status.done{color:var(--mute)}
+.hello{font-family:'East Sea Dokdo',cursive; font-size:24px; line-height:1.45; color:#cfe6e2; text-align:center; margin:8px 0 14px}
+.rule{font-size:13.5px; color:var(--mute); background:rgba(255,255,255,.03); padding:10px 12px; border-radius:6px; margin-bottom:14px}
+.rule b{color:var(--ink)}
+.mem{border:1px solid rgba(201,164,92,.25); border-radius:8px; padding:12px 12px 10px; margin:10px 0; background:rgba(20,10,12,.7)}
+.mem .t{display:flex; justify-content:space-between; align-items:baseline; gap:8px}
+.mem .t b{font-family:'Hahmlet',serif; font-size:16px; color:var(--gold2)} .mem .t span{color:var(--mute); font-size:13px}
+.mem .w{font-family:'Hahmlet',serif; font-weight:800; font-size:32px; color:var(--red2); text-align:center; letter-spacing:4px; margin:6px 0}
+.mem details{font-size:14px; color:#d6c7b4} .mem summary{cursor:pointer; color:var(--mute); font-size:13px}
+.sell{display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; margin-top:8px}
+.sell button{font-size:20px; padding:8px 0; border-radius:6px; border:1px solid rgba(201,164,92,.35); background:#1a0d0f; color:var(--ink); cursor:pointer}
+.sell button.r{color:var(--red2)} .sell button small{display:block; font-size:11px; color:var(--mute)}
+.sell button:active{transform:scale(.96)}
+.sum{text-align:center; font-size:15px; margin:14px 0 4px} .sum b{color:var(--gold2); font-size:22px}
+.pick{display:grid; gap:12px; margin-top:20px}
+.pick button{padding:18px; font-family:'Hahmlet',serif; font-size:19px; border:1px solid var(--gold); border-radius:8px; background:#140b0c; color:var(--ink); cursor:pointer}
+.pick button small{display:block; font-family:'Hahmlet',serif; font-size:13px; color:var(--mute); margin-top:4px}
+.ghostbtn{background:none; border:0; color:var(--mute); text-decoration:underline; font:inherit; font-size:13px; cursor:pointer; display:block; margin:18px auto 0}
+.toast{position:fixed; left:50%; bottom:20px; transform:translateX(-50%); background:#1d2a2c; border:1px solid var(--gold); padding:8px 16px; border-radius:6px; font-size:14px; z-index:9}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script type="module">
+import { connect, login, LOGIN_CSS, HOUSES, pIdx, atToday, fmtLeft, esc } from './net.js';
+document.head.append(Object.assign(document.createElement('style'), {textContent: LOGIN_CSS}));
+const $ = s => document.querySelector(s);
+const N = await connect();
+await login(N, 'npc', '망자 역 화면');
+let me = localStorage.getItem('hmrh_ghost') || '', data = {}, st = {}, cfg = {}, npcAll = {};
+const toast = t => { const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.append(d); setTimeout(() => d.remove(), 1800); };
+
+function pick(){
+  $('#app').innerHTML = `<div class="k">Ghosts by the River</div><h1>어떤 망자를 맡으셨나요?</h1>
+    <div class="pick">${['cat', 'hatter'].map(g => `<button data-g="${g}">${esc((data[g] || {}).name || g)}<small>${esc(((data[g] || {}).desc || '').slice(0, 60))}...</small></button>`).join('')}</div>`;
+  $('#app').querySelectorAll('[data-g]').forEach(b => b.onclick = () => { me = b.dataset.g; localStorage.setItem('hmrh_ghost', me); start(); });
+}
+let presenceOn = false;
+function start(){ if(!presenceOn){ N.presence('npc/' + me + '/online', true, false); presenceOn = true; } render(); }
+
+function status(){
+  const ph = st.phase || 'arrive', now = N.now();
+  if(pIdx(ph) < pIdx('act2')) return ['wait', '아직 판매 시간이 아닙니다. 2막(' + ((cfg.schedule || {}).act2 || {}).time + ')부터 강가에 나타나세요.'];
+  if(ph === 'act2'){ const end = atToday(((cfg.schedule || {}).trial || {}).time, now); return ['open', '지금 기억을 팝니다 · 재판까지 ' + fmtLeft(end - now)]; }
+  return ['done', '판매가 끝났습니다. 배가 뜰 시간을 기다리세요.'];
+}
+function render(){
+  const d = data[me]; if(!d) return pick();
+  const mine = npcAll[me] || {}, sales = Object.entries(mine.sales || {}), [cls, txt] = status();
+  $('#app').innerHTML = `<div class="k">Ghost by the River</div><h1>${esc(d.name)}</h1><p class="desc">${esc(d.desc)}</p>
+    <div class="status ${cls}" id="stat">${esc(txt)}</div>
+    <div class="hello">${esc(d.hello)}</div>
+    <div class="rule"><b>은화 세 닢</b>을 받으면, 손님이 고른 기억의 <b>단어 하나</b>만 귓속말로 알려 주세요. 동전 없이 말을 걸면 인사말만 합니다. 팔고 나면 아래에서 <b>산 가문</b>을 눌러 기록해 주세요.</div>
+    ${d.mems.map((m, i) => { const n = sales.filter(([, s]) => s.mem === i).length;
+      return `<div class="mem"><div class="t"><b>기억 ${i + 1} · ${esc(m.title)}</b><span>팔린 횟수 ${n}</span></div><div class="w">${esc(m.word)}</div>
+        <details><summary>기억 내용 보기 (연기 참고용)</summary>${esc(m.text)}</details>
+        <div class="sell">${HOUSES.map(h => `<button class="${h.red ? 'r' : ''}" data-m="${i}" data-h="${h.k}">${h.s}<small>${h.n}</small></button>`).join('')}</div></div>`; }).join('')}
+    <div class="sum">받은 은화 <b>${sales.length * 3}</b>닢</div>
+    <button class="ghostbtn" id="undo">마지막 판매 기록 취소</button>
+    <button class="ghostbtn" id="swap">다른 망자로 바꾸기</button>`;
+  $('#app').querySelectorAll('[data-m]').forEach(b => b.onclick = async () => {
+    await N.push('npc/' + me + '/sales', { mem: Number(b.dataset.m), house: b.dataset.h, at: N.now() });
+    toast((HOUSES.find(h => h.k === b.dataset.h) || {}).s + ' 가문에 "' + d.mems[b.dataset.m].title + '" 판매 기록'); });
+  $('#undo').onclick = async () => { const last = sales.sort((a, b) => b[1].at - a[1].at)[0]; if(!last) return; if(confirm('마지막 판매 기록을 지울까요?')){ await N.remove('npc/' + me + '/sales/' + last[0]); toast('취소했습니다'); } };
+  $('#swap').onclick = () => { localStorage.removeItem('hmrh_ghost'); me = ''; pick(); };
+}
+N.on('npcdata', v => { data = v || {}; me ? render() : pick(); });
+N.on('state', v => { st = v || {}; if(me && data[me]) render(); });
+N.on('config', v => { cfg = v || {}; });
+N.on('npc', v => { npcAll = v || {}; if(me && data[me]) render(); });
+setInterval(() => { const s = $('#stat'); if(s && data[me]){ const [c, t] = status(); s.className = 'status ' + c; s.textContent = t; } }, 1000);
+</script>
+</body>
+</html>
