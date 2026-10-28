@@ -6,69 +6,89 @@
 <title>무대 - Hunting Mellow Red Hare</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@400;500;600;700;800&family=East+Sea+Dokdo&family=Pinyon+Script&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700;900&family=Song+Myung&family=Pinyon+Script&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0b0506; --ink:#eadfcd; --mute:#a8998a; --gold:#c9a45c; --gold2:#e6c98a; --red:#b31b2b; --red2:#e0414f; --line:rgba(201,164,92,.35)}
 *{box-sizing:border-box}
-html,body{margin:0; height:100%; overflow:hidden; background:radial-gradient(ellipse at 50% 35%, #2a0b10 0%, #120607 55%, #050203 100%); color:var(--ink); font-family:'Hahmlet',serif}
+html,body{margin:0; height:100%; overflow:hidden; background:radial-gradient(ellipse at 50% 35%, #2a0b10 0%, #120607 55%, #050203 100%); color:var(--ink); font-family:'Noto Serif KR',serif}
 body{font-size:2.2vh}
 #app{position:absolute; inset:0; display:grid; grid-template-rows:auto 1fr auto; padding:3vh 4vw}
 header{display:flex; align-items:center; justify-content:space-between; gap:2vw}
 .brand{font-family:'Pinyon Script',cursive; color:var(--gold2); font-size:4.4vh; text-shadow:0 0 2vh rgba(201,164,92,.35)} .brand .r{color:var(--red2)}
-.now{text-align:right; font-family:'Hahmlet',serif; color:var(--mute); font-size:2.2vh; letter-spacing:.3vh}
+.now{text-align:right; font-family:'Noto Serif KR',serif; color:var(--mute); font-size:2.2vh; letter-spacing:.3vh}
 .now b{display:block; color:var(--gold2); font-size:4.2vh; letter-spacing:.5vh}
 main{position:relative; display:flex; align-items:center; justify-content:center; min-height:0}
 footer{display:flex; justify-content:space-between; align-items:flex-end; color:var(--mute); font-size:2vh; letter-spacing:.2vh}
 footer .suits{color:var(--gold); letter-spacing:1.4vh; font-size:2.4vh} footer .suits .r{color:var(--red2)}
-.next b{color:var(--gold2); font-family:'Hahmlet',serif; font-size:3vh; margin-left:1vw}
+.next b{color:var(--gold2); font-family:'Noto Serif KR',serif; font-size:3vh; margin-left:1vw}
 .scene{width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; animation:fade 1s ease both}
 @keyframes fade{from{opacity:0; transform:translateY(1.5vh)} to{opacity:1; transform:none}}
 .kicker{font-family:'Pinyon Script',cursive; color:var(--gold2); font-size:5vh}
-h1{font-family:'Hahmlet',serif; font-weight:800; font-size:8vh; line-height:1.3; margin:1vh 0; letter-spacing:.6vh}
+h1{font-family:'Noto Serif KR',serif; font-weight:800; font-size:8vh; line-height:1.3; margin:1vh 0; letter-spacing:.6vh}
 h1 .red{color:var(--red2)}
 .sub{color:var(--mute); font-size:2.8vh; letter-spacing:.3vh}
 .watch{height:30vh; filter:drop-shadow(0 0 3vh rgba(201,164,92,.3))}
 .watch .hand{transform-origin:50px 50px; transition:transform 2.4s cubic-bezier(.6,0,.2,1)}
 /* opening */
 .op{max-width:80vw; text-align:left; font-size:calc(var(--fs, 1) * 1em)}
-.op h2{font-family:'Hahmlet',serif; text-align:center; color:var(--gold2); font-size:2.1em; margin:0 0 3vh; letter-spacing:.5vh}
+.op h2{font-family:'Noto Serif KR',serif; text-align:center; color:var(--gold2); font-size:2.1em; margin:0 0 3vh; letter-spacing:.5vh}
 .op p{font-size:1.4em; line-height:1.85; margin:0 0 1.6vh; text-indent:1.2em}
-.op p.pen{font-family:'East Sea Dokdo',cursive; color:#ff5b68; font-size:2.1em; line-height:1.35; text-indent:0; text-align:center; margin:2.2vh 0}
-.op p.wel{font-family:'Hahmlet',serif; font-weight:800; text-align:center; text-indent:0; color:var(--gold2); font-size:1.6em}
+.op p.pen{font-family:'Song Myung',cursive; color:#ff5b68; font-size:2.1em; line-height:1.35; text-indent:0; text-align:center; margin:2.2vh 0}
+.op p.wel{font-family:'Noto Serif KR',serif; font-weight:800; text-align:center; text-indent:0; color:var(--gold2); font-size:1.6em}
 .op p.clo{text-align:center; text-indent:0; color:var(--red2); font-weight:700}
 .op .pg{text-align:center; color:var(--gold); letter-spacing:1vh; margin-top:2vh}
 /* houses */
 .houses{display:grid; grid-template-columns:repeat(4, 1fr); gap:2vw; width:100%; max-width:88vw; margin-top:3vh}
 .hc{border-top:.3vh solid var(--gold); padding:2vh 1vw 1vh; background:linear-gradient(180deg, rgba(201,164,92,.10), transparent)}
 .hc .s{font-size:6vh; line-height:1} .hc.red .s{color:var(--red2)}
-.hc .n{font-family:'Hahmlet',serif; font-weight:800; font-size:2.8vh; margin:.5vh 0 1.4vh}
+.hc .n{font-family:'Noto Serif KR',serif; font-weight:800; font-size:2.8vh; margin:.5vh 0 1.4vh}
 .bar{display:flex; align-items:center; gap:1vw; font-size:1.9vh; color:var(--mute); margin:.8vh 0; text-align:left}
 .bar span{flex:0 0 9.5em} .bar i{flex:1; height:1vh; background:rgba(255,255,255,.08); border-radius:1vh; overflow:hidden; position:relative}
 .bar i b{position:absolute; inset:0 auto 0 0; background:linear-gradient(90deg, var(--red), var(--red2)); border-radius:1vh; transition:width 1s}
 .bar em{flex:0 0 3em; font-style:normal; color:var(--ink); text-align:right}
 /* event */
-.spell{font-family:'East Sea Dokdo',cursive; color:#ff4d5e; font-size:15vh; line-height:1.1; margin:2vh 0; text-shadow:0 0 4vh rgba(255,40,60,.55); animation:breath 3s ease-in-out infinite}
+.spell{font-family:'Song Myung',cursive; color:#ff4d5e; font-size:15vh; line-height:1.1; margin:2vh 0; text-shadow:0 0 4vh rgba(255,40,60,.55); animation:breath 3s ease-in-out infinite}
 @keyframes breath{50%{text-shadow:0 0 7vh rgba(255,40,60,.85)}}
 .count{width:60vw; margin-top:2vh}
 .count .bar span{flex-basis:auto} .count .bar i{height:1.6vh}
 .count .lab{font-size:2.6vh; color:var(--gold2); margin-bottom:1vh}
 .remind{position:absolute; right:0; bottom:0; text-align:right; color:var(--mute); font-size:1.9vh}
-.remind b{font-family:'East Sea Dokdo',cursive; color:#ff6b78; font-size:3.6vh; font-weight:400}
+.remind b{font-family:'Song Myung',cursive; color:#ff6b78; font-size:3.6vh; font-weight:400}
 .ghosts{display:flex; gap:4vw; margin-top:4vh}
 .gh{min-width:28vw; padding:2.4vh 2vw; border-top:1px solid var(--gold); border-bottom:1px solid var(--gold)}
-.gh .gn{font-family:'Hahmlet',serif; font-weight:800; font-size:3.4vh; color:var(--gold2)}
+.gh .gn{font-family:'Noto Serif KR',serif; font-weight:800; font-size:3.4vh; color:var(--gold2)}
 .gh .gc{font-size:2.4vh; color:var(--mute); margin-top:1vh} .gh .gc b{color:var(--red2); font-size:4vh}
-.final p{font-family:'Hahmlet',serif; font-size:4vh; line-height:1.7; margin:1.4vh 0; opacity:0; animation:fade 2s ease forwards}
-.final p.en{font-family:'Pinyon Script',cursive; color:var(--gold2); font-size:9vh}
+.final p{font-family:'Noto Serif KR',serif; font-size:3vh; line-height:1.65; margin:1vh auto; max-width:82vw; opacity:0; animation:fade 2s ease forwards}
+.final .watch{height:18vh}
+.final .kicker{font-family:'Noto Serif KR',serif; font-weight:800; font-size:3.6vh; color:var(--red2); margin:1vh 0}
+.final p.en{font-family:'Pinyon Script',cursive; color:var(--gold2); font-size:8vh}
 /* announcement */
 .ann{position:absolute; inset:0; z-index:20; display:flex; align-items:center; justify-content:center; background:rgba(5,2,3,.9); animation:fade .6s ease both}
 .ann div{max-width:76vw; text-align:center; padding:5vh 4vw; border-top:1px solid var(--gold); border-bottom:1px solid var(--gold)}
 .ann small{display:block; font-family:'Pinyon Script',cursive; color:var(--gold2); font-size:4vh; margin-bottom:2vh}
-.ann p{margin:0; font-family:'Hahmlet',serif; font-weight:800; font-size:5.4vh; line-height:1.6}
+.ann p{margin:0; font-family:'Noto Serif KR',serif; font-weight:800; font-size:5.4vh; line-height:1.6}
 /* start + status */
 .start{position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center; background:#050203}
-.start button{font-family:'Hahmlet',serif; font-size:3vh; padding:2vh 5vw; background:var(--red); color:#fff; border:0; border-radius:.6vh; cursor:pointer}
+.start button{font-family:'Noto Serif KR',serif; font-size:3vh; padding:2vh 5vw; background:var(--red); color:#fff; border:0; border-radius:.6vh; cursor:pointer}
 .start p{color:var(--mute); text-align:center; font-size:2vh; margin-top:2vh}
+.memory{max-width:80vw; font-size:calc(var(--fs, 1) * 1em)}
+.memory p{font-size:1.5em; line-height:1.8; margin:0 0 1.2vh; font-style:italic; color:#efe2cc; opacity:0; animation:fade 2.2s ease forwards}
+.murm p{max-width:72vw; margin:1.4vh auto; font-size:2.5vh; line-height:1.7; color:#cdbba6; font-style:italic; opacity:0; animation:fade 2s ease forwards}
+.vq0{color:var(--mute); font-size:2.6vh; max-width:70vw; line-height:1.7}
+.tally{display:flex; gap:4vw; margin:4vh 0 2vh}
+.tally .t{width:26vw} .tally .t b{display:block; font-family:'Noto Serif KR',serif; font-size:3.4vh; margin-bottom:1vh}
+.tally .t em{display:block; font-style:normal; font-size:9vh; line-height:1; color:var(--gold2); font-family:'Noto Serif KR',serif; font-weight:900}
+.tally .t.no em{color:#9fb7c9}
+.tally .t i{display:block; height:1.4vh; background:rgba(255,255,255,.08); border-radius:1vh; overflow:hidden; margin-top:1.4vh}
+.tally .t i s{display:block; height:100%; background:linear-gradient(90deg, var(--red), var(--red2)); transition:width 1s}
+.tally .t.no i s{background:linear-gradient(90deg, #3b5466, #8fb0c8)}
+#floats{position:fixed; inset:0; pointer-events:none; z-index:5; overflow:hidden}
+.float{position:absolute; bottom:-12vh; max-width:34vw; padding:1.4vh 1.6vw; font-size:2.4vh; line-height:1.6; color:#f1e6d4; background:rgba(20,8,10,.55); border-left:.3vh solid var(--gold); animation:floatUp 16s linear forwards}
+.float small{display:block; color:var(--gold2); font-size:1.8vh; margin-top:.4vh}
+@keyframes floatUp{0%{transform:translateY(0); opacity:0} 8%{opacity:1} 85%{opacity:1} 100%{transform:translateY(-105vh); opacity:0}}
+#bigThought{min-height:30vh; display:flex; flex-direction:column; align-items:center; justify-content:center}
+#bigThought p{font-family:'Noto Serif KR',serif; font-weight:700; font-size:6vh; line-height:1.5; max-width:76vw; margin:0; animation:fade 1.2s ease both}
+#bigThought small{color:var(--gold2); font-size:2.6vh; margin-top:2vh; animation:fade 1.2s ease both}
 .dot{position:fixed; left:1vw; bottom:1vh; width:1vh; height:1vh; border-radius:50%; background:#3b8f4a; opacity:.6}
 .dot.off{background:#a33}
 </style>
@@ -79,6 +99,7 @@ h1 .red{color:var(--red2)}
   <main id="main"></main>
   <footer><div class="suits">♠ <span class="r">♥</span> <span class="r">♦</span> ♣</div><div class="next" id="next"></div></footer>
 </div>
+<div id="floats"></div>
 <div class="dot" id="dot"></div>
 <audio id="a0" loop preload="auto"></audio><audio id="a1" loop preload="auto"></audio>
 <script type="module">
@@ -88,7 +109,7 @@ const $ = s => document.querySelector(s);
 const N = await connect();
 await login(N, 'host', '무대 화면');
 
-let st = {}, cfg = {}, players = {}, host = {}, npc = {}, opening = [];
+let st = {}, cfg = {}, players = {}, host = {}, npc = {}, votes = {}, thoughts = [], opening = [];
 try{ opening = await (await fetch('opening.json')).json(); }catch(e){}
 
 // ---------- start (a click is needed before the TV may play sound) ----------
@@ -144,11 +165,11 @@ function eventScene(ch, kicker, title){
     <div class="spell">${esc((host.keys || {})[ch] || '')}</div>
     <div class="count"><div class="lab">주문을 외운 손님 ${n} / ${ms.length}</div><div class="bar"><i><b style="width:${pct}%"></b></i></div></div></div>`;
 }
-let scene = '', annT = null;
+let scene = '', annT = null, dataVer = 0, rang = false;
 function render(){
   const ph = st.phase || 'arrive';
   $('#phaseName').textContent = PHASE_NAME[ph] || '';
-  let html = '', key = ph;
+  let html = '', key = ph + '#' + dataVer;
   const ch = PHASE_CH[ph];
   const spellView = ch && (st.showSpell || members().filter(p => has(p, ch)).length < members().length || N.now() - (st.phaseAt || 0) < 4 * 60e3);
   if(ph === 'arrive'){
@@ -161,12 +182,32 @@ function render(){
     html = `<div class="scene">${WATCH}<div class="kicker">Act One</div><h1 style="font-size:6vh">1막 · 4문양 화합의 만찬</h1>
       ${houseBars([['c2','첫 번째 문 통과'],['c3','두 번째 문 통과'],['c4','시계가 잠든 자리']])}</div>`;
     key += '|' + JSON.stringify(members().map(p => [p.house, p.opened]));
-  } else if(ph === 'end' && st.stageScene === 'ending'){
-    html = `<div class="scene final">${WATCH}${(host.endLines || []).map((l, i) => `<p class="${/^[A-Za-z ,.]+$/.test(l) ? 'en' : ''}" style="animation-delay:${10 + i * 3}s">${esc(l)}</p>`).join('')}</div>`;
-    key += '|ending';
+  } else if(ph === 'end' && st.stageScene === 'memory'){
+    html = `<div class="scene"><div class="kicker">The Guest Remembers</div><div class="memory">${(host.memory || []).map((l, i) => `<p style="animation-delay:${1 + i * 5.5}s">${esc(l)}</p>`).join('')}</div></div>`;
+    key += '|memory';
+  } else if(ph === 'end' && st.stageScene === 'vote'){
+    const vs = Object.values(votes), y = vs.filter(v => v.v === 'yes').length, n = vs.filter(v => v.v === 'no').length, tot = Math.max(1, y + n);
+    const q = host.question || ['', ''];
+    html = `<div class="scene"><div class="vq0">${esc(q[0])}</div><h1 style="font-size:7vh">${esc(q[1])}</h1>
+      <div class="tally"><div class="t"><b>네</b><em>${y}</em><i><s style="width:${y / tot * 100}%"></s></i></div><div class="t no"><b>아니오</b><em>${n}</em><i><s style="width:${n / tot * 100}%"></s></i></div></div>
+      <div class="sub">고른 손님 ${y + n} / ${members().length}</div></div>`;
+    key += '|vote|' + y + '/' + n + '/' + members().length;
+  } else if(ph === 'end' && st.stageScene === 'ending' && st.verdict && (host.endings || {})[st.verdict]){
+    const E = host.endings[st.verdict], nar = E.lines.filter(l => l.startsWith('n:')).map(l => l.slice(2));
+    html = `<div class="scene final">${WATCH}<div class="kicker" style="animation:fade 2s 3s both">${esc(E.title)}</div>${[...nar, ...E.finals].map((l, i, a) => `<p class="${i === a.length - 1 ? 'en' : ''}" style="animation-delay:${9 + i * 4}s">${esc(l)}</p>`).join('')}</div>`;
+    key += '|ending|' + st.verdict;
+  } else if(ph === 'end' && st.stageScene === 'thoughts'){
+    html = `<div class="scene"><div class="kicker">Your Thoughts</div><h1 style="font-size:5vh">당신들의 생각</h1><div id="bigThought"></div></div>`;
+    key += '|thoughts';
   } else if(ch && spellView){
     const T = {mid:['Time Secret','시간의 <span class="red">비밀</span>'], act2:['Old Memories','오래된 기억을 모아'], trial:['The Trial','자정의 <span class="red">재판</span>'], end:['The Last Bell','자정의 <span class="red">종</span>']}[ph];
     html = eventScene(ch, T[0], T[1]); key += '|ev|' + members().filter(p => has(p, ch)).length + '/' + members().length;
+  } else if(ph === 'mid'){
+    html = `<div class="scene">${WATCH}<div class="kicker">Time Secret</div><h1 style="font-size:6vh">시간의 <span class="red">비밀</span></h1><div class="murm">${(host.midmurmurs || []).map((l, i) => `<p style="animation-delay:${1.5 + i * 4}s">${esc(l)}</p>`).join('')}</div>
+      <div class="remind">늦게 온 손님을 위한 주문<br><b>${esc((host.keys || {}).c5 || '')}</b></div></div>`;
+  } else if(ph === 'trial'){
+    html = `<div class="scene">${WATCH}<div class="kicker">The Trial</div><h1 style="font-size:6vh">자정의 재판</h1><div class="murm">${(host.murmurs || []).map((l, i) => `<p style="animation-delay:${1.5 + i * 4}s">${esc(l)}</p>`).join('')}</div>
+      <div class="remind">늦게 온 손님을 위한 주문<br><b>${esc((host.keys || {}).c7 || '')}</b></div></div>`;
   } else if(ph === 'act2'){
     const sold = g => Object.values((npc[g] || {}).sales || {}).length;
     const gname = g => ((host.npc || {})[g] || {}).name || (g === 'cat' ? '체셔 고양이' : '모자장수');
@@ -180,13 +221,14 @@ function render(){
     html = `<div class="scene">${WATCH}<h1 style="font-size:6vh">${esc(PHASE_NAME[ph])}</h1></div>`;
   }
   if(key !== scene){
-    const sameShell = scene.split('|')[0] === key.split('|')[0] && $('.watch');
+    const sameShell = scene.split('|')[0].split('#')[0] === key.split('|')[0].split('#')[0] && $('.watch');
     scene = key; $('#main').innerHTML = html;
-    const min = ph === 'end' && st.stageScene === 'ending' ? 719 : STORY_MIN[ph];
+    const min = ph === 'end' ? 719 : STORY_MIN[ph];
     if($('.watch')){ const w = $('.watch'); w.querySelectorAll('.hand').forEach(h => h.style.transition = 'none');
       setWatch(sameShell || lastMin == null ? min : lastMin); requestAnimationFrame(() => { w.querySelectorAll('.hand').forEach(h => h.style.transition = ''); setWatch(min); }); }
     const op = $('.op'); if(op){ let f = 1.15; op.style.setProperty('--fs', f); while(f > .5 && op.scrollHeight > $('#main').clientHeight){ f -= .03; op.style.setProperty('--fs', f); } }
-    if(key === 'end|ending'){ setTimeout(() => { setWatch(720); bell(6); }, 1200); }
+    const mem = $('.memory'); if(mem){ let f = 1.1; mem.style.setProperty('--fs', f); while(f > .5 && mem.scrollHeight > $('#main').clientHeight - 60){ f -= .04; mem.style.setProperty('--fs', f); } }
+    if(ph === 'end' && st.stageScene === 'ending' && st.verdict){ if(!rang){ rang = true; setTimeout(() => { setWatch(720); bell(6); }, 1200); } else setWatch(720); } else rang = false;
   }
   syncBgm();
 }
@@ -202,8 +244,25 @@ N.on('state', v => { st = v || {}; if(lastPhase && st.phase !== lastPhase && PHA
 N.on('config', v => { cfg = v || {}; render(); });
 N.on('players', v => { players = v || {}; render(); });
 N.on('npc', v => { npc = v || {}; render(); });
-N.on('hostdata', v => { host = Object.assign(host, v || {}); render(); });
-N.on('npcdata', v => { host.npc = v || {}; render(); });
+N.on('votes', v => { votes = v || {}; render(); });
+// thoughts: new ones float up first, then the old ones keep drifting by
+const fresh = []; let seenT = 0, cyc = 0, big = 0;
+N.on('thoughts', v => { const arr = Object.values(v || {}).filter(t => t && t.text).sort((a, b) => a.at - b.at); if(arr.length < seenT) seenT = 0; fresh.push(...arr.slice(seenT)); seenT = arr.length; thoughts = arr; });
+const suitOf = k => (HOUSES.find(h => h.k === k) || {}).s || '';
+setInterval(() => {
+  const fl = $('#floats');
+  if(!(st.phase === 'end' && st.stageScene === 'vote')){ fl.innerHTML = ''; return; }
+  if(fl.children.length >= 6 || !thoughts.length) return;
+  const t = fresh.shift() || thoughts[cyc++ % thoughts.length];
+  const d = document.createElement('div'); d.className = 'float'; d.style.left = (4 + Math.random() * 62) + 'vw';
+  d.innerHTML = `${esc(t.text)}<small>${suitOf(t.house)}</small>`; fl.append(d); setTimeout(() => d.remove(), 16500);
+}, 2600);
+setInterval(() => {
+  const bt = $('#bigThought'); if(!bt || !thoughts.length) return;
+  const t = thoughts[big++ % thoughts.length]; bt.innerHTML = `<p>"${esc(t.text)}"</p><small>${suitOf(t.house)}</small>`;
+}, 6500);
+N.on('hostdata', v => { host = Object.assign(host, v || {}); dataVer++; render(); });
+N.on('npcdata', v => { host.npc = v || {}; dataVer++; render(); });
 N.on('.info/connected', v => $('#dot').classList.toggle('off', v === false));
 autoAdvance(N, () => st, () => cfg);
 setInterval(tick, 500); tick();

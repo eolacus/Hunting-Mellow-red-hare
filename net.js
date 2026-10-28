@@ -154,6 +154,6 @@ export async function login(N, role, title){
 }
 export const LOGIN_CSS = `.login{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;background:#0b0405;padding:16px}
 .login .lb{width:100%;max-width:340px;text-align:center;padding:28px 20px;border:1px solid #c9a45c;background:#140709}
-.login .lk{font-family:'Pinyon Script',cursive;color:#e6c98a;font-size:22px}.login h2{font-family:'Hahmlet',serif;color:#efe3d0;margin:6px 0 16px;font-size:20px}
+.login .lk{font-family:'Pinyon Script',cursive;color:#e6c98a;font-size:22px}.login h2{font-family:'Noto Serif KR',serif;color:#efe3d0;margin:6px 0 16px;font-size:20px}
 .login input{width:100%;box-sizing:border-box;padding:12px;font-size:16px;background:#000;color:#efe3d0;border:1px solid #6b4a2a;border-radius:4px;margin-bottom:10px;text-align:center}
 .login button{width:100%;padding:12px;font-size:15px;background:#9e1b2b;color:#fff;border:0;border-radius:4px}.login .lm{color:#e0414f;font-size:13px;margin-top:8px;min-height:18px}`;
