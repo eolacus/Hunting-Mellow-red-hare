@@ -67,14 +67,16 @@ async function firebaseBackend(cfg){
   const cred = await A.signInAnonymously(auth);
   const db = D.getDatabase(app);
   const r = p => D.ref(db, p);
+  // a refused write (rules, expired login) must not fail silently: tell the page
+  const warn = (path, e) => { console.error('write failed', path, e); window.dispatchEvent(new CustomEvent('neterr', { detail: path + ': ' + (e && e.code || e) })); };
   let offset = 0; D.onValue(r('.info/serverTimeOffset'), s => { offset = s.val() || 0; });
   return {
     mode: 'firebase', uid: cred.user.uid,
     now: () => Date.now() + offset,
     on(path, cb){ return D.onValue(r(path), s => cb(s.val()), () => cb(null)); },
     async get(path){ return (await D.get(r(path))).val(); },
-    set: (path, val) => D.set(r(path), val),
-    update: (path, obj) => D.update(r(path), obj),
+    set: (path, val) => D.set(r(path), val).catch(e => { warn(path, e); }),
+    update: (path, obj) => D.update(r(path), obj).catch(e => { warn(path, e); }),
     async push(path, val){ const p = D.push(r(path)); await D.set(p, val); return p.key; },
     remove: path => D.remove(r(path)),
     presence(path, onVal, offVal){
@@ -120,6 +122,7 @@ export function scheduledPhase(schedule, nowMs){
 }
 // admin pages keep the phase moving forward on schedule (never backward)
 export function autoAdvance(N, getState, getConfig){
+  return;   // manual only: the host moves every phase by hand
   setInterval(() => {
     const st = getState(), cfg = getConfig(); if(!st || !cfg || st.auto === false) return;
     const sp = scheduledPhase(cfg.schedule, N.now());

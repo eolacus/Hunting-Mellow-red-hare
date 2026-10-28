@@ -68,8 +68,8 @@ ul.ans{margin:0; padding-left:18px; font-size:13.5px} ul.ans li{margin:3px 0}
     <div class="big" id="phaseBig">-</div>
     <div class="muted" id="phaseSince"></div>
     <div class="phases" id="phaseBtns"></div>
-    <div class="row"><button id="prevP">◂ 이전 단계</button><button class="pri" id="nextP">다음 단계 ▸</button><button id="autoBtn"></button></div>
-    <div class="muted">자동 진행을 켜 두면 타임테이블 시각에 맞춰 단계가 앞으로만 넘어갑니다. 결말과 자유 파티는 기본으로 수동입니다.</div>
+    <div class="row"><button id="prevP">◂ 이전 단계</button><button class="pri" id="nextP">다음 단계 ▸</button><button id="autoBtn" style="display:none"></button></div>
+    <div class="muted">단계는 자동으로 넘어가지 않습니다. 진행자가 단계 버튼이나 "다음 단계"를 눌러야 무대와 모두의 휴대폰이 넘어갑니다. 타임테이블은 시각 안내와 BGM 배정용입니다.</div>
   </section>
 
   <section>
@@ -141,6 +141,7 @@ $('#hMode').className = 'pill ' + (N.mode === 'firebase' ? 'on' : 'off');
 let st = {}, cfg = {}, players = {}, host = {}, npc = {}, npcdata = {}, tracks = [], stage = {}, filter = 'all';
 try{ tracks = await (await fetch('bgm/tracks.json', {cache:'no-store'})).json(); }catch(e){}
 const toast = t => { const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.append(d); setTimeout(() => d.remove(), 2200); };
+window.addEventListener('neterr', e => { const d = document.createElement('div'); d.className = 'toast'; d.style.background = '#8a0f1c'; d.textContent = '저장 실패 (' + e.detail + ') - Firebase 규칙과 seed를 다시 넣었는지, 비밀번호가 seed의 hostPin과 같은지 확인하세요.'; document.body.append(d); setTimeout(() => d.remove(), 6000); });
 const setState = o => N.update('state', o);
 const CH_ORDER = ['c2','c3','c4','c5','c6','c7','c8'];
 
@@ -157,7 +158,7 @@ function renderPhase(){
   $('#phaseSince').textContent = st.phaseAt ? fmtClock(st.phaseAt) + '부터' : '';
   document.querySelectorAll('#phaseBtns button').forEach(b => b.classList.toggle('on', b.dataset.p === p));
   $('#autoBtn').textContent = st.auto === false ? '자동 진행 꺼짐' : '자동 진행 켜짐'; $('#autoBtn').classList.toggle('on', st.auto !== false);
-  $('#autoLbl').textContent = st.auto === false ? '수동' : '타임테이블 자동';
+  $('#autoLbl').textContent = '수동 진행';
   $('#spellBtn').classList.toggle('on', !!st.showSpell); $('#spellBtn').textContent = st.showSpell ? '주문 크게 띄우는 중 (끄기)' : '주문 다시 크게 띄우기';
   document.querySelectorAll('[data-sc]').forEach(b => b.classList.toggle('on', st.phase === 'end' && st.stageScene === b.dataset.sc));
   $('#opNum').textContent = ((st.openingPage || 0) + 1) + ' / 3';
