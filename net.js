@@ -100,6 +100,9 @@ export function connect(){
 // ---------- shared game constants ----------
 export const PHASES = ['arrive', 'opening', 'act1', 'mid', 'act2', 'trial', 'end', 'party'];
 export const PHASE_NAME = { arrive: '입장', opening: '오프닝', act1: '1막 - 4문양 화합의 만찬', mid: '중간 이벤트 - 시간의 비밀', act2: '2막 - 오래된 기억을 모아', trial: '자정의 재판', end: '결말 - 자정의 종', party: '자유 파티' };
+// opening starts with a few minutes for everyone to read their house handbook, unless the host moves on
+export const ENVELOPE_MS = 5 * 60e3;
+export const envelopeOn = (st, now) => !!st && st.phase === 'opening' && now - (st.phaseAt || 0) < ENVELOPE_MS && !((st.opGoAt || 0) > (st.phaseAt || 0));
 export const PHASE_CH = { mid: 'c5', act2: 'c6', trial: 'c7', end: 'c8' };
 export const STORY_MIN = { arrive: 420, opening: 420, act1: 420, mid: 500, act2: 510, trial: 719, end: 719, party: 720 };
 export const HOUSES = [
@@ -120,13 +123,19 @@ export function scheduledPhase(schedule, nowMs){
   for(const e of Object.values(schedule || {})) if(e && e.auto && atToday(e.time, nowMs) <= nowMs && (!best || pIdx(e.phase) > pIdx(best))) best = e.phase;
   return best;
 }
-// admin pages keep the phase moving forward on schedule (never backward)
+// admin pages move the phase forward on schedule. It acts when a scheduled time is newly reached
+// (or once on load to catch up), so a manual step back is not undone until the next scheduled time.
 export function autoAdvance(N, getState, getConfig){
-  return;   // manual only: the host moves every phase by hand
+  let last, wasOn;
   setInterval(() => {
-    const st = getState(), cfg = getConfig(); if(!st || !cfg || st.auto === false) return;
+    const st = getState(), cfg = getConfig(); if(!st || !cfg || !st.phase) return;
+    const on = st.auto !== false; if(on && wasOn === false) last = undefined;   // resuming catches up to the clock
+    wasOn = on;
     const sp = scheduledPhase(cfg.schedule, N.now());
-    if(sp && pIdx(sp) > pIdx(st.phase)) N.update('state', { phase: sp, phaseAt: N.now() });
+    if(sp === last) return;
+    last = sp;
+    if(st.auto === false) return;
+    if(sp && pIdx(sp) > pIdx(st.phase)) N.update('state', { phase: sp, phaseAt: N.now(), stageScene: '', showSpell: false, openingPage: 0 });
   }, 2000);
 }
 // next timed entry after now

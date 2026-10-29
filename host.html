@@ -68,8 +68,8 @@ ul.ans{margin:0; padding-left:18px; font-size:13.5px} ul.ans li{margin:3px 0}
     <div class="big" id="phaseBig">-</div>
     <div class="muted" id="phaseSince"></div>
     <div class="phases" id="phaseBtns"></div>
-    <div class="row"><button id="prevP">◂ 이전 단계</button><button class="pri" id="nextP">다음 단계 ▸</button><button id="autoBtn" style="display:none"></button></div>
-    <div class="muted">단계는 자동으로 넘어가지 않습니다. 진행자가 단계 버튼이나 "다음 단계"를 눌러야 무대와 모두의 휴대폰이 넘어갑니다. 타임테이블은 시각 안내와 BGM 배정용입니다.</div>
+    <div class="row"><button id="prevP">◂ 이전 단계</button><button class="pri" id="nextP">다음 단계 ▸</button><button id="autoBtn"></button></div>
+    <div class="muted">타임테이블 시각이 되면 단계가 저절로 넘어갑니다. 일시정지하면 시각이 지나도 멈춰 있고, 재개하면 지금 시각의 단계로 따라잡습니다. 이전 단계로 되돌리면 다음 예정 시각까지는 그 단계에 머뭅니다. 결말과 자유 파티는 늘 손으로 넘깁니다.</div>
   </section>
 
   <section>
@@ -130,7 +130,7 @@ ul.ans{margin:0; padding-left:18px; font-size:13.5px} ul.ans li{margin:3px 0}
   </section>
 </main>
 <script type="module">
-import { connect, login, LOGIN_CSS, PHASES, PHASE_NAME, HOUSES, TITLES, pIdx, atToday, autoAdvance, nextEntry, fmtClock, fmtLeft, esc } from './net.js';
+import { connect, login, LOGIN_CSS, envelopeOn, PHASES, PHASE_NAME, HOUSES, TITLES, pIdx, atToday, autoAdvance, nextEntry, fmtClock, fmtLeft, esc } from './net.js';
 document.head.append(Object.assign(document.createElement('style'), {textContent: LOGIN_CSS}));
 const $ = s => document.querySelector(s);
 const N = await connect();
@@ -146,10 +146,10 @@ const setState = o => N.update('state', o);
 const CH_ORDER = ['c2','c3','c4','c5','c6','c7','c8'];
 
 // ---------- phase ----------
-function goPhase(p){ setState({ phase: p, phaseAt: N.now(), stageScene: '', showSpell: false }); toast(PHASE_NAME[p] + '(으)로 넘겼습니다'); }
+function goPhase(p){ setState({ phase: p, phaseAt: N.now(), stageScene: '', showSpell: false, openingPage: 0 }); toast(PHASE_NAME[p] + '(으)로 넘겼습니다'); }
 $('#phaseBtns').innerHTML = PHASES.map(p => `<button data-p="${p}">${PHASE_NAME[p].split(' - ')[0]}</button>`).join('');
 $('#phaseBtns').onclick = e => { const p = e.target.dataset.p; if(p && confirm(PHASE_NAME[p] + ' 단계로 바꿀까요?')) goPhase(p); };
-$('#prevP').onclick = () => { const i = pIdx(st.phase); if(i > 0 && confirm('이전 단계로 되돌릴까요? 자동 진행이 켜져 있으면 시각이 지난 단계로 다시 넘어갈 수 있어요.')) goPhase(PHASES[i - 1]); };
+$('#prevP').onclick = () => { const i = pIdx(st.phase); if(i > 0 && confirm('이전 단계로 되돌릴까요? 다음 예정 시각이 될 때까지는 이 단계에 머뭅니다.')) goPhase(PHASES[i - 1]); };
 $('#nextP').onclick = () => { const i = pIdx(st.phase); if(i < PHASES.length - 1) goPhase(PHASES[i + 1]); };
 $('#autoBtn').onclick = () => setState({ auto: st.auto === false });
 function renderPhase(){
@@ -157,17 +157,18 @@ function renderPhase(){
   $('#hPhase').textContent = PHASE_NAME[p]; $('#phaseBig').textContent = PHASE_NAME[p];
   $('#phaseSince').textContent = st.phaseAt ? fmtClock(st.phaseAt) + '부터' : '';
   document.querySelectorAll('#phaseBtns button').forEach(b => b.classList.toggle('on', b.dataset.p === p));
-  $('#autoBtn').textContent = st.auto === false ? '자동 진행 꺼짐' : '자동 진행 켜짐'; $('#autoBtn').classList.toggle('on', st.auto !== false);
-  $('#autoLbl').textContent = '수동 진행';
+  $('#autoBtn').textContent = st.auto === false ? '▶ 자동 진행 재개' : '⏸ 일시정지'; $('#autoBtn').classList.toggle('on', st.auto === false);
+  $('#autoLbl').textContent = st.auto === false ? '일시정지됨' : '타임테이블 자동';
   $('#spellBtn').classList.toggle('on', !!st.showSpell); $('#spellBtn').textContent = st.showSpell ? '주문 크게 띄우는 중 (끄기)' : '주문 다시 크게 띄우기';
   document.querySelectorAll('[data-sc]').forEach(b => b.classList.toggle('on', st.phase === 'end' && st.stageScene === b.dataset.sc));
-  $('#opNum').textContent = ((st.openingPage || 0) + 1) + ' / 3';
+  $('#opNum').textContent = envelopeOn(st, N.now()) ? '설정서 확인 중 (▸ 누르면 이야기 시작)' : ((st.openingPage || 0) + 1) + ' / 3';
   $('#bgmPlay').textContent = st.bgmPlaying === false ? '▶ 음악 켜기' : '⏸ 음악 끄기';
 }
 
 // ---------- stage ----------
 $('#opPrev').onclick = () => setState({ openingPage: Math.max(0, (st.openingPage || 0) - 1) });
-$('#opNext').onclick = () => setState({ openingPage: Math.min(2, (st.openingPage || 0) + 1) });
+$('#opNext').onclick = () => { if(envelopeOn(st, N.now())){ setState({ opGoAt: N.now(), openingPage: 0 }); toast('설정서 확인을 마치고 이야기를 시작합니다'); return; } setState({ openingPage: Math.min(2, (st.openingPage || 0) + 1) }); };
+setInterval(() => { if(st.phase === 'opening') renderPhase(); }, 5000);
 $('#spellBtn').onclick = () => setState({ showSpell: !st.showSpell });
 let votes = {}, thoughtsN = 0;
 const tally = () => { const vs = Object.values(votes); return { y: vs.filter(v => v.v === 'yes').length, n: vs.filter(v => v.v === 'no').length }; };
@@ -294,7 +295,14 @@ function tick(){ const now = N.now(); $('#hClock').textContent = fmtClock(now); 
   $('#hNext').innerHTML = nx ? `다음 <b>${esc(nx.label)}</b> ${fmtLeft(nx.t - now)}` : '다음 일정 없음'; }
 const all = () => { renderTally(); renderPhase(); renderBgm(); renderTT(); renderPlayers(); renderNpc(); };
 N.on('state', v => { st = v || {}; all(); });
-N.on('config', v => { cfg = v || {}; all(); });
+let migrated = false;
+N.on('config', v => { cfg = v || {};
+  // a seed from the manual-only build has every row switched off: turn the timetable back on once
+  const sc = cfg.schedule || {}, rows = Object.values(sc);
+  if(!migrated && rows.length && rows.every(e => e && e.auto === false)){ migrated = true;
+    const up = {}; for(const [k, e] of Object.entries(sc)) if(!['end', 'party'].includes(e.phase || k)) up[k + '/auto'] = true;
+    N.update('config/schedule', up); setState({ auto: true }); }
+  all(); });
 N.on('players', v => { players = v || {}; renderPlayers(); });
 N.on('npc', v => { npc = v || {}; renderNpc(); });
 N.on('npcdata', v => { npcdata = v || {}; renderNpc(); });

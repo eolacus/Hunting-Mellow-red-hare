@@ -450,6 +450,16 @@ const $ = s => document.querySelector(s);
 const el = (t, cls, html) => { const e = document.createElement(t); if(cls) e.className = cls; if(html!=null) e.innerHTML = html; return e; };
 const esc = s => s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const md = s => esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/&lt;br&gt;/g,'<br>');
+// ending text: break lines where a reader would pause
+function poem(h){
+  h = h.replace('요괴들에게 하나의 질문이', '요괴들에게<br>하나의 질문이');
+  return h.split(/(?<=[.?!…](?:["”’]|<\/b>)?)\s+/).map(x => {
+    if(x.includes('<br>') || x.replace(/<[^>]+>/g, '').length <= 30) return x;
+    const cs = [...x.matchAll(/, /g)].map(m => m.index); if(!cs.length) return x;
+    const mid = x.length / 2, c = cs.reduce((a, b) => Math.abs(b - mid) < Math.abs(a - mid) ? b : a);
+    return x.slice(0, c + 1) + '<br>' + x.slice(c + 2);
+  }).join('<br>');
+}
 
 function renderBadge(){
   const b = $('#badge'); b.innerHTML = '';
@@ -543,8 +553,8 @@ function dialogue(b, ch){
   const wrap = el('div','dlg');
   const lines = b.v.map(l => {
     const g = l.startsWith('@'); const t = g ? l.slice(1) : l;
-    if(l.startsWith('~')){ const d = el('div','line memo', `<div class="bubble">${md(l.slice(1))}</div>`); wrap.append(d); return d; }
-    const d = el('div','line' + (g ? ' guest' : ''), g ? `<div class="who">♦</div><div class="bubble"><span class="nm">시간의 손님</span>${md(t)}</div>` : `<div class="who">🐇</div><div class="bubble"><span class="nm">붉은 토끼</span>${md(t)}</div>`);
+    if(l.startsWith('~')){ const d = el('div','line memo', `<div class="bubble">${poem(md(l.slice(1)))}</div>`); wrap.append(d); return d; }
+    const d = el('div','line' + (g ? ' guest' : ''), g ? `<div class="who">♦</div><div class="bubble"><span class="nm">시간의 손님</span>${poem(md(t))}</div>` : `<div class="who">🐇</div><div class="bubble"><span class="nm">붉은 토끼</span>${md(t)}</div>`);
     wrap.append(d); return d;
   });
   const fin = b.final ? el('div','final', b.final.map((l,i) => i===b.final.length-1 ? `<p class="hh">${esc(l)}</p>` : `<p>${md(l)}</p>`).join('')) : null;
@@ -1162,7 +1172,7 @@ function voteBlock(b, ch){
     if(verdict && b.endings[verdict]){ renderEnding(box, b, verdict, ch); return; }
     if(online && !st.voteOpen && !mine){ box.append(el('div','vwait', '시간의 손님의 이야기가 끝났습니다.<br>붉은 토끼가 질문을 꺼낼 때까지, 무대를 바라봐 주십시오.')); return; }
     if(!mine){
-      box.append(el('p','vq0', md(b.q[0])), el('h3','vq', md(b.q[1])));
+      box.append(el('p','vq0', poem(md(b.q[0]))), el('h3','vq', md(b.q[1])));
       const row = el('div','vbtns');
       [['yes', b.endings.yes.label], ['no', b.endings.no.label]].forEach(([k, lab]) => { const bt = el('button', 'btn' + (k==='no' ? ' ghost' : ''), lab);
         bt.onclick = () => { S.set('myVote', k); if(LIVE.N) LIVE.N.set('votes/' + LIVE.N.uid, { v: k, house: house || '', at: LIVE.N.now() }).catch(() => {}); SFX.door(); draw(); };
@@ -1187,9 +1197,9 @@ function renderEnding(box, b, k, ch){
   const E = b.endings[k], O = b.endings[k === 'yes' ? 'no' : 'yes'];
   box.append(el('div','vk', 'The Last Bell'), el('h3','etitle', esc(E.title)));
   E.lines.forEach(l => box.append(l.startsWith('r:')
-    ? el('div','line show', `<div class="who">🐇</div><div class="bubble"><span class="nm">붉은 토끼</span>${md(l.slice(2))}</div>`)
-    : el('p','enarr', md(l.slice(2)))));
-  box.append(el('div','final show', E.finals.map((l, i) => i === E.finals.length - 1 ? `<p class="hh">${esc(l)}</p>` : `<p>${md(l)}</p>`).join('')));
+    ? el('div','line show', `<div class="who">🐇</div><div class="bubble"><span class="nm">붉은 토끼</span>${poem(md(l.slice(2)))}</div>`)
+    : el('p','enarr', poem(md(l.slice(2))))));
+  box.append(el('div','final show', E.finals.map((l, i) => i === E.finals.length - 1 ? `<p class="hh">${esc(l)}</p>` : `<p>${poem(md(l))}</p>`).join('')));
   const other = ['#"' + O.label + '"를 선택한 경우의 미래', ...O.lines.map(l => l.startsWith('r:') ? '붉은 토끼: "' + l.slice(2) + '"' : l.slice(2)), ...O.finals];
   renderBlocks(box, [{ t: 'hidden', v: [...b.hidden, ...other] }], ch);
   if(!S.get('verdictSeen', false)){ S.set('verdictSeen', true); SFX.toll(); setClock(720, 2400); } else if(!clockBusy) setClock(720, 0);
