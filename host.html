@@ -75,7 +75,7 @@ ul.ans{margin:0; padding-left:18px; font-size:13.5px} ul.ans li{margin:3px 0}
   <section>
     <h2>무대 화면 <small id="stageNow"></small></h2>
     <div class="row"><span class="muted">오프닝 페이지</span><button id="opPrev">◂</button><b id="opNum">1 / 3</b><button id="opNext">▸</button></div>
-    <div class="row"><button id="spellBtn">주문 다시 크게 띄우기</button></div>
+    <div class="muted">오프닝: 봉투 확인 5분 → Prologue 14초 → 이야기 3장이 저절로 넘어갑니다(한 장당 시간은 타임테이블 아래에서). ◂ ▸로 언제든 넘길 수 있습니다.</div>
     <div class="muted" style="margin-top:8px">결말 연출 (결말 단계에서 차례로)</div>
     <div class="row"><button data-sc="memory">① 인간의 기억</button><button data-sc="vote">② 질문 열기</button><button data-sc="ending">③ 결말 공개</button><button data-sc="thoughts">④ 모두의 생각</button></div>
     <div class="row"><span class="muted">결말</span><select id="verdictMode"><option value="auto">다수결 (같으면 네)</option><option value="yes">"네" 결말로</option><option value="no">"아니오" 결말로</option></select><b id="tally" class="muted"></b></div>
@@ -89,12 +89,15 @@ ul.ans{margin:0; padding-left:18px; font-size:13.5px} ul.ans li{margin:3px 0}
     <div class="row"><button id="bgmPlay"></button><span class="muted">볼륨</span><input type="range" id="vol" min="0" max="1" step="0.05" style="flex:1"></div>
     <div class="row"><select id="ovr" style="flex:1"></select><button id="ovrBtn">지금 이 곡 틀기</button></div>
     <div class="row"><button id="ovrOff">타임테이블대로 돌아가기</button></div>
-    <div class="muted">음악 파일은 사이트의 bgm 폴더에 올리고 bgm/tracks.json에 이름을 적어 두세요. 소리는 무대 화면(TV)에서만 나옵니다.</div>
+    <div class="row"><input type="file" id="upFile" accept="audio/*,.mp3,.m4a,.wav,.ogg" multiple style="flex:1; min-width:0"><button class="pri" id="upBtn">음악 올리기</button></div>
+    <div class="muted" id="upMsg">여기서 올린 곡은 바로 위 "곡 고르기"와 타임테이블 BGM 칸에 ⬆ 표시로 나타납니다. 한 곡 15MB 이하. 소리는 무대 화면(TV)에서만 나옵니다.</div>
+    <div id="upList"></div>
   </section>
 
   <section class="wide">
     <h2>타임테이블 <small>시각을 바꾸면 바로 저장됩니다</small></h2>
     <table class="tt" id="tt"></table>
+    <div class="row"><span class="muted">오프닝 이야기 한 장당</span><input type="number" id="opSec" min="20" max="600" step="5" style="width:90px"><span class="muted">초 자동 넘김 (봉투 확인 5분, Prologue 14초는 고정)</span></div>
     <div class="row"><button id="shiftP">아직 안 온 일정 5분 미루기</button><button id="shiftM">5분 당기기</button></div>
   </section>
 
@@ -109,6 +112,11 @@ ul.ans{margin:0; padding-left:18px; font-size:13.5px} ul.ans li{margin:3px 0}
     <h2>전체 공지 <small>참석자 화면 위에 뜹니다</small></h2>
     <textarea id="bcText" placeholder="예: 20:50, 재판까지 10분 남았습니다. 가문끼리 모여 답을 정해 주세요."></textarea>
     <div class="row"><select id="bcTo"><option value="all">모두에게</option><option value="spade">♠ 스페이드</option><option value="heart">♥ 하트</option><option value="clover">♣ 클로버</option><option value="diamond">♦ 다이아</option></select><button class="pri" id="bcSend">보내기</button></div>
+  </section>
+
+  <section>
+    <h2>손님이 붉은 토끼에게 <small id="ltN"></small></h2>
+    <div class="log" id="ltLog"><div class="muted">아직 받은 말이 없습니다.</div></div>
   </section>
 
   <section>
@@ -130,7 +138,7 @@ ul.ans{margin:0; padding-left:18px; font-size:13.5px} ul.ans li{margin:3px 0}
   </section>
 </main>
 <script type="module">
-import { connect, login, LOGIN_CSS, envelopeOn, PHASES, PHASE_NAME, HOUSES, TITLES, pIdx, atToday, autoAdvance, nextEntry, fmtClock, fmtLeft, esc } from './net.js';
+import { connect, login, LOGIN_CSS, envelopeOn, openingPageNow, openingStoryStart, publishKeys, pageSec, CARD_MS, PHASES, PHASE_NAME, HOUSES, TITLES, pIdx, atToday, autoAdvance, nextEntry, fmtClock, fmtLeft, esc } from './net.js';
 document.head.append(Object.assign(document.createElement('style'), {textContent: LOGIN_CSS}));
 const $ = s => document.querySelector(s);
 const N = await connect();
@@ -159,17 +167,20 @@ function renderPhase(){
   document.querySelectorAll('#phaseBtns button').forEach(b => b.classList.toggle('on', b.dataset.p === p));
   $('#autoBtn').textContent = st.auto === false ? '▶ 자동 진행 재개' : '⏸ 일시정지'; $('#autoBtn').classList.toggle('on', st.auto === false);
   $('#autoLbl').textContent = st.auto === false ? '일시정지됨' : '타임테이블 자동';
-  $('#spellBtn').classList.toggle('on', !!st.showSpell); $('#spellBtn').textContent = st.showSpell ? '주문 크게 띄우는 중 (끄기)' : '주문 다시 크게 띄우기';
   document.querySelectorAll('[data-sc]').forEach(b => b.classList.toggle('on', st.phase === 'end' && st.stageScene === b.dataset.sc));
-  $('#opNum').textContent = envelopeOn(st, N.now()) ? '설정서 확인 중 (▸ 누르면 이야기 시작)' : ((st.openingPage || 0) + 1) + ' / 3';
+  const now = N.now();
+  $('#opNum').textContent = st.phase !== 'opening' ? '오프닝 아님' : envelopeOn(st, now) ? '설정서 확인 중 (▸ 누르면 다음)' : now < openingStoryStart(st) ? 'Prologue 화면 (▸ 누르면 이야기)' : (openingPageNow(st, cfg, now) + 1) + ' / 3 · 자동 ' + pageSec(cfg) + '초';
   $('#bgmPlay').textContent = st.bgmPlaying === false ? '▶ 음악 켜기' : '⏸ 음악 끄기';
 }
 
 // ---------- stage ----------
-$('#opPrev').onclick = () => setState({ openingPage: Math.max(0, (st.openingPage || 0) - 1) });
-$('#opNext').onclick = () => { if(envelopeOn(st, N.now())){ setState({ opGoAt: N.now(), openingPage: 0 }); toast('설정서 확인을 마치고 이야기를 시작합니다'); return; } setState({ openingPage: Math.min(2, (st.openingPage || 0) + 1) }); };
+$('#opPrev').onclick = () => { const now = N.now(); if(st.phase !== 'opening' || now < openingStoryStart(st)) return;
+  setState({ openingPage: Math.max(0, openingPageNow(st, cfg, now) - 1), openingPageAt: now }); };
+$('#opNext').onclick = () => { const now = N.now(); if(st.phase !== 'opening') return toast('오프닝 단계에서만 씁니다');
+  if(envelopeOn(st, now)){ setState({ opGoAt: now, openingPage: 0 }); toast('설정서 확인을 마칩니다'); return; }
+  if(now < openingStoryStart(st)){ setState({ opGoAt: now - CARD_MS, openingPage: 0, openingPageAt: 0 }); toast('이야기를 시작합니다'); return; }
+  setState({ openingPage: Math.min(2, openingPageNow(st, cfg, now) + 1), openingPageAt: now }); };
 setInterval(() => { if(st.phase === 'opening') renderPhase(); }, 5000);
-$('#spellBtn').onclick = () => setState({ showSpell: !st.showSpell });
 let votes = {}, thoughtsN = 0;
 const tally = () => { const vs = Object.values(votes); return { y: vs.filter(v => v.v === 'yes').length, n: vs.filter(v => v.v === 'no').length }; };
 function renderTally(){ const t = tally(); $('#tally').textContent = `네 ${t.y} · 아니오 ${t.n} · 생각 ${thoughtsN}개` + (st.verdict ? ` · 공개된 결말: ${st.verdict === 'yes' ? '네' : '아니오'}` : ''); }
@@ -187,13 +198,44 @@ $('#stageSend').onclick = () => { const t = $('#stageText').value.trim(); if(!t)
 $('#stageClear').onclick = () => setState({ stageMsg: null });
 
 // ---------- bgm ----------
-const trackName = f => (tracks.find(t => t.file === f) || {}).name || f || '없음';
-function fillTracks(sel, val, none){ sel.innerHTML = `<option value="">${none}</option>` + tracks.map(t => `<option value="${esc(t.file)}">${esc(t.name)}</option>`).join(''); sel.value = val || ''; }
+// tracks = files in the site's bgm folder + songs uploaded from this panel (stored in the database, played by the stage)
+const allTracks = () => [...tracks, ...Object.entries(cfg.uploads || {}).sort((a, b) => (a[1].at || 0) - (b[1].at || 0)).map(([k, u]) => ({ file: 'up:' + k, name: '⬆ ' + u.name }))];
+const trackName = f => (allTracks().find(t => t.file === f) || {}).name || f || '없음';
+function fillTracks(sel, val, none){ sel.innerHTML = `<option value="">${none}</option>` + allTracks().map(t => `<option value="${esc(t.file)}">${esc(t.name)}</option>`).join(''); sel.value = val || ''; }
 $('#bgmPlay').onclick = () => setState({ bgmPlaying: st.bgmPlaying === false });
 $('#vol').oninput = e => N.update('config', { volume: Number(e.target.value) });
 $('#ovrBtn').onclick = () => { N.update('config', { bgmOverride: $('#ovr').value }); toast('무대에서 ' + trackName($('#ovr').value) + ' 재생'); };
 $('#ovrOff').onclick = () => { N.update('config', { bgmOverride: '' }); toast('타임테이블 BGM으로 돌아갑니다'); };
+// ---------- upload songs from this panel ----------
+const CHUNK = 512 * 1024;
+const b64 = u8 => { let s = ''; for(let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); };
+$('#upBtn').onclick = async () => {
+  const files = [...$('#upFile').files]; if(!files.length) return toast('올릴 음악 파일을 먼저 고르세요');
+  if(N.mode !== 'firebase') return toast('연습 모드에서는 음악을 올릴 수 없습니다. 실제 주소로 여세요');
+  $('#upBtn').disabled = true;
+  try{
+    for(const f of files){
+      if(f.size > 15 * 1024 * 1024){ toast(f.name + ': 15MB가 넘어 건너뜁니다'); continue; }
+      const buf = new Uint8Array(await f.arrayBuffer()), n = Math.ceil(buf.length / CHUNK);
+      const key = 'u' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      for(let i = 0; i < n; i++){
+        $('#upMsg').textContent = `${f.name} 올리는 중... ${Math.round(i / n * 100)}%`;
+        await N.set(`bgmdata/${key}/c/${i}`, b64(buf.subarray(i * CHUNK, (i + 1) * CHUNK)));
+      }
+      await N.update('config/uploads', { [key]: { name: f.name.replace(/\.[^.]+$/, ''), type: f.type || 'audio/mpeg', size: f.size, n, at: N.now() } });
+      toast(f.name + ' 올렸습니다');
+    }
+    $('#upMsg').textContent = '올리기를 마쳤습니다. 무대 화면이 곡을 미리 받아 둡니다.'; $('#upFile').value = '';
+  } finally { $('#upBtn').disabled = false; }
+};
+function renderUploads(){
+  const ups = Object.entries(cfg.uploads || {}).sort((a, b) => (a[1].at || 0) - (b[1].at || 0));
+  $('#upList').innerHTML = ups.map(([k, u]) => `<div class="row"><span style="flex:1">⬆ ${esc(u.name)} <span class="muted">${(u.size / 1048576).toFixed(1)}MB</span></span><button data-del="${esc(k)}">삭제</button></div>`).join('');
+}
+$('#upList').onclick = async e => { const k = e.target.dataset.del; if(!k) return; const u = (cfg.uploads || {})[k]; if(!u || !confirm(`"${u.name}"을(를) 지울까요?`)) return;
+  await N.remove(`bgmdata/${k}`); await N.remove(`config/uploads/${k}`); toast('지웠습니다'); };
 function renderBgm(){
+  renderUploads();
   const seg = (cfg.schedule || {})[st.phase] || {};
   const want = cfg.bgmOverride || seg.bgm || '';
   $('#bgmNow').textContent = (st.bgmPlaying === false ? '멈춤 · ' : '') + (cfg.bgmOverride ? '직접 고른 곡: ' : '일정: ') + trackName(want);
@@ -212,12 +254,14 @@ function renderTT(){
   if(document.activeElement && $('#tt').contains(document.activeElement)) return;
   $('#tt').innerHTML = '<tr><td class="muted">단계</td><td class="muted">시작</td><td class="muted">자동</td><td class="muted">BGM</td></tr>' + rows;
   $('#tt').querySelectorAll('tr[data-p]').forEach(tr => fillTracks(tr.querySelector('select'), S[tr.dataset.p].bgm, '음악 없음'));
+  if(document.activeElement !== $('#opSec')) $('#opSec').value = pageSec(cfg);
 }
 $('#tt').onchange = e => { const tr = e.target.closest('tr'); if(!tr) return; const k = e.target.dataset.k;
   const v = k === 'auto' ? e.target.checked : e.target.value; N.update('config/schedule/' + tr.dataset.p, { [k]: v }); toast('저장했습니다'); };
 const shift = d => { const now = N.now(), S = cfg.schedule || {}, up = {};
   for(const [p, e] of Object.entries(S)){ const t = atToday(e.time, now); if(t > now){ const n = new Date(t + d * 60e3); up[p + '/time'] = String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0'); } }
   if(Object.keys(up).length){ N.update('config/schedule', up); toast('아직 안 온 일정을 ' + (d > 0 ? d + '분 미뤘습니다' : (-d) + '분 당겼습니다')); } };
+$('#opSec').onchange = e => { N.update('config', { openingSec: Math.max(20, Number(e.target.value) || 95) }); toast('저장했습니다'); };
 $('#shiftP').onclick = () => shift(5); $('#shiftM').onclick = () => shift(-5);
 
 // ---------- players ----------
@@ -287,14 +331,14 @@ function renderAns(){
 
 // ---------- tools ----------
 $('#wipe').onclick = async () => { if(!confirm('게임 기록을 모두 지울까요? (참석자 명단, 진행, 판매 기록, 공지)')) return;
-  await Promise.all(['players', 'npc', 'broadcast', 'votes', 'thoughts'].map(p => N.remove(p)));
-  await N.update('state', { phase: 'arrive', phaseAt: N.now(), stageScene: '', showSpell: false, stageMsg: null, openingPage: 0, verdict: null, voteOpen: false }); toast('초기화했습니다'); };
+  await Promise.all(['players', 'npc', 'broadcast', 'votes', 'thoughts', 'letters'].map(p => N.remove(p)));
+  await N.update('state', { phase: 'arrive', phaseAt: N.now(), stageScene: '', showSpell: false, stageMsg: null, openingPage: 0, openingPageAt: 0, opGoAt: 0, open: null, verdict: null, voteOpen: false }); toast('초기화했습니다'); };
 
 // ---------- live ----------
 function tick(){ const now = N.now(); $('#hClock').textContent = fmtClock(now); const nx = nextEntry(cfg.schedule, now, st.phase);
   $('#hNext').innerHTML = nx ? `다음 <b>${esc(nx.label)}</b> ${fmtLeft(nx.t - now)}` : '다음 일정 없음'; }
 const all = () => { renderTally(); renderPhase(); renderBgm(); renderTT(); renderPlayers(); renderNpc(); };
-N.on('state', v => { st = v || {}; all(); });
+N.on('state', v => { st = v || {}; all(); publishKeys(N, st, host.keys); });
 let migrated = false;
 N.on('config', v => { cfg = v || {};
   // a seed from the manual-only build has every row switched off: turn the timetable back on once
@@ -306,7 +350,10 @@ N.on('config', v => { cfg = v || {};
 N.on('players', v => { players = v || {}; renderPlayers(); });
 N.on('npc', v => { npc = v || {}; renderNpc(); });
 N.on('npcdata', v => { npcdata = v || {}; renderNpc(); });
-N.on('hostdata', v => { host = v || {}; renderAns(); });
+N.on('hostdata', v => { host = v || {}; renderAns(); publishKeys(N, st, host.keys); });
+N.on('letters', v => { const ls = Object.values(v || {}).filter(l => l && l.text).sort((a, b) => b.at - a.at), H = Object.fromEntries(HOUSES.map(h => [h.k, h.s]));
+  $('#ltN').textContent = ls.length ? ls.length + '개' : '';
+  if(ls.length) $('#ltLog').innerHTML = ls.map(l => `<div><b>${esc(H[l.house] || '')} ${esc(l.name || '(이름 없음)')}</b> <span class="muted">${fmtClock(l.at)}</span><br>${esc(l.text)}</div>`).join(''); });
 N.on('stage', v => { stage = v || {}; $('#hStage').textContent = stage.online ? '무대 화면 연결됨' : '무대 화면 꺼짐'; $('#hStage').className = 'pill ' + (stage.online ? 'on' : 'off');
   $('#stageNow').textContent = stage.nowPlaying ? '재생 중: ' + trackName(stage.nowPlaying) : ''; });
 autoAdvance(N, () => st, () => cfg);

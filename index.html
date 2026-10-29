@@ -7,22 +7,22 @@
 <title>경계의 문 · 붉은 토끼의 회중시계</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700;900&family=Song+Myung&family=Pinyon+Script&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700;900&family=Song+Myung&family=Pinyon+Script&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#0d0708; --bg2:#1a0b0e; --ink:#eadfcd; --mute:#a8998a; --gold:#c9a45c; --gold2:#e6c98a;
-  --red:#b31b2b; --red2:#e0414f; --panel:rgba(22,10,12,.78); --line:rgba(201,164,92,.35);
+  --red:#b31b2b; --red2:#e0414f; --panel:rgba(14,11,9,.82); --line:rgba(201,164,92,.35);
   --accent:#c9a45c;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
-html{background:#0b0506}
+html{background:#070606}
 body{
   min-height:100vh; color:var(--ink); font-family:'Noto Serif KR',serif; font-size:16px; line-height:1.85;
   background:
-    radial-gradient(120% 70% at 50% -10%, #3a0d15 0%, rgba(58,13,21,0) 60%),
-    radial-gradient(90% 60% at 50% 110%, #22090d 0%, rgba(34,9,13,0) 70%),
-    linear-gradient(180deg,#120709 0%, #0b0506 100%);
+    radial-gradient(120% 60% at 50% -10%, rgba(201,164,92,.16) 0%, rgba(201,164,92,0) 55%),
+    radial-gradient(90% 60% at 50% 110%, rgba(120,20,30,.22) 0%, rgba(120,20,30,0) 70%),
+    linear-gradient(180deg,#0e0b09 0%, #070606 100%);
   background-attachment:fixed; overflow-x:hidden;
 }
 body::after{ /* vignette */
@@ -52,10 +52,10 @@ header{position:relative}
 
 main{position:relative; z-index:2; max-width:560px; margin:0 auto; padding:18px 16px 40px}
 header{text-align:center; padding:14px 0 6px}
-.clock{width:74px; height:74px; margin:0 auto 4px; display:block; filter:drop-shadow(0 0 14px rgba(201,164,92,.35))}
+.clock{width:92px; height:92px; margin:0 auto 6px; display:block; filter:drop-shadow(0 0 16px rgba(201,164,92,.4))}
 .script{font-family:'Pinyon Script',cursive; color:var(--gold2); font-size:30px; line-height:1.1; letter-spacing:.5px; text-shadow:0 0 18px rgba(201,164,92,.35)}
 .script .red{color:var(--red2)}
-.kr-title{font-family:'Noto Serif KR',serif; font-weight:800; color:var(--ink); font-size:14px; letter-spacing:6px; margin-top:6px; opacity:.85}
+.kr-title{font-family:'Song Myung','Noto Serif KR',serif; color:var(--ink); font-size:15px; letter-spacing:6px; margin-top:6px; opacity:.9}
 .suits{color:var(--gold); letter-spacing:10px; font-size:13px; margin:6px 0 0; opacity:.8}
 .suits .r{color:var(--red2)}
 
@@ -73,7 +73,7 @@ nav.chapters button.on{color:#1a0b0e; background:var(--gold); border-color:var(-
 .panel::before,.panel::after{content:"♥"; position:absolute; font-size:11px; color:var(--red2); opacity:.7}
 .panel::before{top:6px; left:9px} .panel::after{content:"♠"; color:var(--gold); bottom:6px; right:9px}
 @keyframes rise{from{opacity:0; transform:translateY(12px)} to{opacity:1; transform:none}}
-h2{font-family:'Noto Serif KR',serif; font-weight:800; font-size:20px; color:var(--gold2); margin:0 0 4px; text-align:center; letter-spacing:1px}
+h2{font-family:'Song Myung','Noto Serif KR',serif; font-weight:400; font-size:22px; color:var(--gold2); margin:0 0 4px; text-align:center; letter-spacing:2px}
 .sub{text-align:center; color:var(--mute); font-size:13px; margin:0 0 18px}
 p{margin:0 0 12px}
 .center{text-align:center}
@@ -96,8 +96,8 @@ p{margin:0 0 12px}
 .q{display:flex; align-items:flex-start; gap:10px; margin:0 0 12px; padding:12px 14px; border-left:2px solid var(--gold); background:rgba(201,164,92,.06)}
 .q b{flex:1; color:var(--gold2); font-weight:700} .q .pt{flex:0 0 auto; font-size:13px; color:var(--red2); font-weight:700; white-space:nowrap; margin-top:2px}
 nav.guide{padding-top:8px; margin-top:8px}
-nav.guide button{color:#f0b7bc; border-color:rgba(224,65,79,.35); background:rgba(179,27,43,.08)}
-nav.guide button.on{color:#fff; background:var(--red); border-color:var(--red)}
+nav.guide button{color:var(--gold2); border-color:rgba(201,164,92,.4); background:rgba(201,164,92,.06)}
+nav.guide button.on{color:#1a1108; background:var(--gold); border-color:var(--gold)}
 .line.guest .who{background:radial-gradient(circle at 35% 30%,#f3e6c6,#b89a5e); color:#b31b2b; box-shadow:0 0 12px rgba(230,201,138,.45); font-size:22px}
 .line.guest .bubble{border-color:rgba(230,201,138,.45); border-radius:14px 4px 14px 14px}
 .line.guest .bubble .nm{color:var(--gold2)}
@@ -129,8 +129,8 @@ ul.dl{margin:0 0 12px; padding-left:18px} ul.dl li{margin:0 0 6px; font-size:15p
 .answer{margin-top:18px; display:flex; gap:8px}
 .answer input,.spell input{flex:1; min-width:0; font-family:inherit; font-size:16px; color:var(--ink); background:rgba(0,0,0,.35); border:1px solid rgba(201,164,92,.45); border-radius:4px; padding:11px 12px; outline:none}
 .answer input:focus,.spell input:focus{border-color:var(--gold2); box-shadow:0 0 0 3px rgba(201,164,92,.15)}
-.btn{font-family:'Noto Serif KR',serif; font-weight:800; font-size:15px; color:#f7e6c4; background:radial-gradient(circle at 35% 30%, #d8313f, #8e1220 70%); border:0; border-radius:4px; padding:11px 16px; cursor:pointer; box-shadow:0 3px 0 #5c0b14, 0 6px 16px rgba(0,0,0,.4); white-space:nowrap}
-.btn:active{transform:translateY(2px); box-shadow:0 1px 0 #5c0b14}
+.btn{font-family:'Noto Serif KR',serif; font-weight:800; font-size:15px; color:#1a1108; background:linear-gradient(180deg, #f0d79c 0%, #c9a45c 55%, #a07f3c 100%); border:1px solid #6b5226; border-radius:3px; padding:11px 16px; cursor:pointer; box-shadow:0 3px 0 #4a3818, 0 6px 16px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.35); letter-spacing:1px; white-space:nowrap}
+.btn:active{transform:translateY(2px); box-shadow:0 1px 0 #4a3818}
 .btn.ghost{background:transparent; color:var(--gold2); border:1px solid var(--gold); box-shadow:none}
 .msg{min-height:1.6em; margin-top:8px; font-size:14px; color:#f0a8ae; text-align:center}
 .msg.ok{color:var(--gold2)}
@@ -180,8 +180,8 @@ p.murmur{font-size:14.5px; color:#bfae9c; font-style:italic; border-left:2px sol
 .tap{display:block; margin:6px auto 0; text-align:center; font-size:13px; color:var(--mute); animation:blink 1.8s infinite; cursor:pointer; background:none; border:0; font-family:inherit}
 @keyframes blink{50%{opacity:.35}}
 
-footer.spell{margin-top:26px; padding:16px 16px 14px; border:1px dashed rgba(224,65,79,.4); border-radius:6px; background:rgba(0,0,0,.25)}
-footer.spell label{display:block; text-align:center; font-family:'Noto Serif KR',serif; font-size:13.5px; color:var(--red2); letter-spacing:3px; margin-bottom:8px}
+footer.spell{margin-top:26px; padding:16px 16px 14px; border:1px solid rgba(201,164,92,.35); outline:1px solid rgba(201,164,92,.15); outline-offset:4px; border-radius:6px; background:rgba(0,0,0,.25)}
+footer.spell label{display:block; text-align:center; font-family:'Noto Serif KR',serif; font-size:13.5px; color:var(--gold2); letter-spacing:3px; margin-bottom:8px}
 footer.spell .row{display:flex; gap:8px}
 .tiny{font-size:12px; color:var(--mute); text-align:center; margin-top:18px; opacity:.7}
 .hide{display:none!important}
@@ -319,7 +319,7 @@ main{transition:transform .9s}
 .goal b{color:var(--gold2)}
 
 /* welcome gate + sound toggle */
-.welcome{position:fixed; inset:0; z-index:90; display:flex; align-items:center; justify-content:center; padding:20px 16px; background:radial-gradient(circle at 50% 40%, #2a0a10 0%, #0b0405 70%); transition:opacity .9s}
+.welcome{position:fixed; inset:0; z-index:90; display:flex; align-items:center; justify-content:center; padding:20px 16px; background:radial-gradient(circle at 50% 40%, #241a0e 0%, #070606 70%); transition:opacity .9s}
 .welcome.out{opacity:0; pointer-events:none}
 .welcome .wbox{max-width:380px; width:100%; text-align:center; padding:30px 22px 26px; border:1px solid var(--gold); outline:1px solid rgba(201,164,92,.35); outline-offset:6px; background:rgba(20,8,10,.85); box-shadow:0 0 50px rgba(0,0,0,.6), inset 0 0 40px rgba(120,20,30,.25); animation:rise 1s ease both}
 .welcome .wsuits{color:var(--gold); letter-spacing:8px; font-size:14px} .welcome .wsuits .r{color:var(--red2)}
@@ -331,10 +331,11 @@ main{transition:transform .9s}
 .welcome .btn{display:block; width:100%; margin-bottom:10px}
 .welcome .wname{display:block; width:100%; box-sizing:border-box; margin:0 0 12px; padding:12px; text-align:center; font-size:16px; background:rgba(0,0,0,.35); color:var(--ink); border:1px solid rgba(201,164,92,.5); border-radius:4px}
 /* live: event gate, messages from the host */
-.evov{position:fixed; inset:0; z-index:85; display:flex; align-items:center; justify-content:center; padding:20px 16px; background:radial-gradient(circle at 50% 40%, rgba(60,6,14,.97), rgba(5,2,3,.98)); animation:rise .6s ease both}
-.evov .eb{max-width:380px; width:100%; text-align:center}
-.evov .ek{font-family:'Pinyon Script',cursive; color:var(--gold2); font-size:24px}
-.evov h2{font-size:24px; margin:8px 0 6px; color:var(--ink)}
+.evov{position:fixed; inset:0; z-index:85; display:flex; align-items:center; justify-content:center; padding:20px 16px; background:radial-gradient(circle at 50% 40%, rgba(40,30,16,.97), rgba(5,4,3,.98)); animation:rise .6s ease both}
+.evov .eb{max-width:380px; width:100%; text-align:center; padding:34px 20px 30px; border:1px solid var(--gold); outline:1px solid rgba(201,164,92,.3); outline-offset:7px}
+.evov .ek{font-family:'Pinyon Script',cursive; color:var(--gold2); font-size:40px; line-height:1.1}
+.evov h2{font-size:32px; margin:10px 0 8px; color:var(--ink)}
+.evov .ew{margin-top:14px} .evov .btn{min-width:140px; margin-top:10px}
 .evov .es{color:var(--red2); margin:0 0 6px; font-size:15px}
 .evov p{color:#d6c7b4; font-size:14.5px; line-height:1.8; margin:0 0 18px}
 .livemsg{position:fixed; left:12px; right:12px; top:14px; z-index:88; margin:0 auto; max-width:420px; padding:16px 18px 14px; background:rgba(14,5,7,.97); border:1px solid var(--gold); border-radius:6px; box-shadow:0 10px 40px rgba(0,0,0,.6); animation:rise .4s ease both}
@@ -369,17 +370,18 @@ main{transition:transform .9s}
   <circle cx="15.6" cy="12.6" r=".9" fill="#e0414f"/><circle cx="18.4" cy="12.6" r=".9" fill="#e0414f"/></svg>
 </div>
     <svg class="clock" viewBox="0 0 100 100" aria-hidden="true">
-      <defs><radialGradient id="g" cx="40%" cy="35%"><stop offset="0" stop-color="#f3e6c6"/><stop offset="1" stop-color="#cdb98f"/></radialGradient></defs>
-      <circle cx="50" cy="12" r="6" fill="none" stroke="#c9a45c" stroke-width="3"/>
-      <circle cx="50" cy="54" r="40" fill="#8a6a34"/><circle cx="50" cy="54" r="36" fill="url(#g)"/>
-      <g stroke="#3a2a1c" stroke-width="1.5">
-        <line x1="50" y1="21" x2="50" y2="26"/><line x1="83" y1="54" x2="78" y2="54"/><line x1="50" y1="87" x2="50" y2="82"/><line x1="17" y1="54" x2="22" y2="54"/></g>
-      <path d="M30 35 L41 47 L37 56 L46 64" stroke="rgba(60,40,20,.45)" stroke-width=".8" fill="none"/>
+      <circle cx="50" cy="7.5" r="4" fill="none" stroke="#c9a45c" stroke-width="1.4"/><path d="M47.5 11.5 h5 v2 h-5z" fill="#c9a45c"/>
+      <circle cx="50" cy="54" r="42.5" fill="#0d0607" stroke="#c9a45c" stroke-width="1.3"/>
+      <g fill="none" stroke="#c9a45c" stroke-width=".45" opacity=".75"><animateTransform attributeName="transform" type="rotate" from="0 50 54" to="-360 50 54" dur="90s" repeatCount="indefinite"/>
+        <path d="M63.20 54.00L64.93 55.47L64.71 56.93L62.63 57.83L62.20 59.05L63.23 61.07L62.47 62.33L60.20 62.37L59.33 63.33L59.52 65.60L58.33 66.47L56.22 65.64L55.05 66.20L54.35 68.35L52.93 68.71L51.29 67.14L50.00 67.20L48.53 68.93L47.07 68.71L46.17 66.63L44.95 66.20L42.93 67.23L41.67 66.47L41.63 64.20L40.67 63.33L38.40 63.52L37.53 62.33L38.36 60.22L37.80 59.05L35.65 58.35L35.29 56.93L36.86 55.29L36.80 54.00L35.07 52.53L35.29 51.07L37.37 50.17L37.80 48.95L36.77 46.93L37.53 45.67L39.80 45.63L40.67 44.67L40.48 42.40L41.67 41.53L43.78 42.36L44.95 41.80L45.65 39.65L47.07 39.29L48.71 40.86L50.00 40.80L51.47 39.07L52.93 39.29L53.83 41.37L55.05 41.80L57.07 40.77L58.33 41.53L58.37 43.80L59.33 44.67L61.60 44.48L62.47 45.67L61.64 47.78L62.20 48.95L64.35 49.65L64.71 51.07L63.14 52.71Z"/><circle cx="50" cy="54" r="11.5"/><line x1="53.00" y1="54.00" x2="61.00" y2="54.00"/><line x1="50.93" y1="56.85" x2="53.40" y2="64.46"/><line x1="47.57" y1="55.76" x2="41.10" y2="60.47"/><line x1="47.57" y1="52.24" x2="41.10" y2="47.53"/><line x1="50.93" y1="51.15" x2="53.40" y2="43.54"/><circle cx="50" cy="54" r="3"/></g>
+      <g><animateTransform attributeName="transform" type="rotate" from="0 50 54" to="360 50 54" dur="240s" repeatCount="indefinite"/>
+        <circle cx="50" cy="54" r="40.6" fill="none" stroke="#c9a45c" stroke-width=".35"/><line x1="50" y1="12.799999999999997" x2="50" y2="15.600000000000001" stroke="#c9a45c" stroke-width="0.7" transform="rotate(0 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(6 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(12 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(18 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(24 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="15.600000000000001" stroke="#c9a45c" stroke-width="0.7" transform="rotate(30 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(36 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(42 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(48 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(54 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="15.600000000000001" stroke="#c9a45c" stroke-width="0.7" transform="rotate(60 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(66 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(72 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(78 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(84 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="15.600000000000001" stroke="#c9a45c" stroke-width="0.7" transform="rotate(90 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(96 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(102 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(108 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(114 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="15.600000000000001" stroke="#c9a45c" stroke-width="0.7" transform="rotate(120 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(126 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(132 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(138 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(144 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="15.600000000000001" stroke="#c9a45c" stroke-width="0.7" transform="rotate(150 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(156 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(162 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(168 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(174 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="15.600000000000001" stroke="#c9a45c" stroke-width="0.7" transform="rotate(180 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(186 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(192 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(198 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(204 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="15.600000000000001" stroke="#c9a45c" stroke-width="0.7" transform="rotate(210 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(216 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(222 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(228 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(234 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="15.600000000000001" stroke="#c9a45c" stroke-width="0.7" transform="rotate(240 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(246 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(252 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(258 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(264 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="15.600000000000001" stroke="#c9a45c" stroke-width="0.7" transform="rotate(270 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(276 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(282 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(288 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(294 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="15.600000000000001" stroke="#c9a45c" stroke-width="0.7" transform="rotate(300 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(306 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(312 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(318 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(324 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="15.600000000000001" stroke="#c9a45c" stroke-width="0.7" transform="rotate(330 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(336 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(342 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(348 50 54)"/><line x1="50" y1="12.799999999999997" x2="50" y2="14.399999999999999" stroke="#c9a45c" stroke-width="0.3" transform="rotate(354 50 54)"/><text x="50" y="21" font-family="Cinzel, serif" font-size="6.2" font-weight="600" fill="#c9a45c" text-anchor="middle" dominant-baseline="middle" transform="rotate(0 50 54)">XII</text><text x="50" y="21" font-family="Cinzel, serif" font-size="6.2" font-weight="600" fill="#c9a45c" text-anchor="middle" dominant-baseline="middle" transform="rotate(30 50 54)">I</text><text x="50" y="21" font-family="Cinzel, serif" font-size="6.2" font-weight="600" fill="#c9a45c" text-anchor="middle" dominant-baseline="middle" transform="rotate(60 50 54)">II</text><text x="50" y="21" font-family="Cinzel, serif" font-size="6.2" font-weight="600" fill="#c9a45c" text-anchor="middle" dominant-baseline="middle" transform="rotate(90 50 54)">III</text><text x="50" y="21" font-family="Cinzel, serif" font-size="6.2" font-weight="600" fill="#c9a45c" text-anchor="middle" dominant-baseline="middle" transform="rotate(120 50 54)">IV</text><text x="50" y="21" font-family="Cinzel, serif" font-size="6.2" font-weight="600" fill="#c9a45c" text-anchor="middle" dominant-baseline="middle" transform="rotate(150 50 54)">V</text><text x="50" y="21" font-family="Cinzel, serif" font-size="6.2" font-weight="600" fill="#c9a45c" text-anchor="middle" dominant-baseline="middle" transform="rotate(180 50 54)">VI</text><text x="50" y="21" font-family="Cinzel, serif" font-size="6.2" font-weight="600" fill="#c9a45c" text-anchor="middle" dominant-baseline="middle" transform="rotate(210 50 54)">VII</text><text x="50" y="21" font-family="Cinzel, serif" font-size="6.2" font-weight="600" fill="#c9a45c" text-anchor="middle" dominant-baseline="middle" transform="rotate(240 50 54)">VIII</text><text x="50" y="21" font-family="Cinzel, serif" font-size="6.2" font-weight="600" fill="#c9a45c" text-anchor="middle" dominant-baseline="middle" transform="rotate(270 50 54)">IX</text><text x="50" y="21" font-family="Cinzel, serif" font-size="6.2" font-weight="600" fill="#c9a45c" text-anchor="middle" dominant-baseline="middle" transform="rotate(300 50 54)">X</text><text x="50" y="21" font-family="Cinzel, serif" font-size="6.2" font-weight="600" fill="#c9a45c" text-anchor="middle" dominant-baseline="middle" transform="rotate(330 50 54)">XI</text>
+        <circle cx="50" cy="54" r="27.5" fill="none" stroke="#c9a45c" stroke-width=".6"/><circle cx="50" cy="54" r="25.8" fill="none" stroke="#c9a45c" stroke-width=".25" stroke-dasharray=".6 1.4"/></g>
       <g transform="translate(0,4)">
-        <line id="hh" class="hand" x1="50" y1="50" x2="49" y2="29" stroke="#2a1d14" stroke-width="3" stroke-linecap="round" style="transform:rotate(210deg)"/>
-        <line id="mh" class="hand" x1="50" y1="50" x2="50" y2="22" stroke="#8e1220" stroke-width="2" stroke-linecap="round" style="transform:rotate(0deg)"/>
+        <g id="hh" class="hand" style="transform:rotate(210deg)"><line x1="50" y1="53" x2="50" y2="32" stroke="#0d0607" stroke-width="4" stroke-linecap="round"/><line x1="50" y1="53" x2="50" y2="32" stroke="#efd79c" stroke-width="2" stroke-linecap="round"/><circle cx="50" cy="35" r="2.2" fill="none" stroke="#efd79c" stroke-width="1"/></g>
+        <g id="mh" class="hand" style="transform:rotate(0deg)"><line x1="50" y1="54" x2="50" y2="22" stroke="#0d0607" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="54" x2="50" y2="22" stroke="#e0414f" stroke-width="1.3" stroke-linecap="round"/></g>
       </g>
-      <circle cx="50" cy="54" r="2.5" fill="#2a1d14"/>
+      <circle cx="50" cy="54" r="2.4" fill="#efd79c" stroke="#0d0607" stroke-width=".8"/>
     </svg>
     <div class="script">Hunting Mellow <span class="red">Red</span> Hare</div>
     <div class="kr-title">붉은 토끼의 회중시계</div>
@@ -393,8 +395,8 @@ main{transition:transform .9s}
   <section id="view"></section>
 
   <footer class="spell" id="spell">
-    <label>붉은 토끼의 주문</label>
-    <div class="row"><input id="spellIn" placeholder="붉은 토끼가 알려 준 주문" autocomplete="off"><button class="btn" id="spellBtn">외우기</button></div>
+    <label>붉은 토끼에게 하고 싶은 말</label>
+    <div class="row"><input id="spellIn" placeholder="붉은 토끼에게 전할 말" autocomplete="off" maxlength="200"><button class="btn" id="spellBtn">보내기</button></div>
     <div class="msg" id="spellMsg"></div>
   </footer>
   <div class="tiny">열린 문의 기억은 당신 손안의 작은 거울에만 새겨집니다. 새로 고쳐 다시 들여다보아도, 열린 문은 그대로 남아 있습니다.</div>
@@ -1000,24 +1002,29 @@ function render(){
   renderBlocks(panel, c, cur);
 }
 
-// ---------- spell box ----------
-async function castSpell(){
-  const inp = $('#spellIn'), msg = $('#spellMsg'), btn = $('#spellBtn');
-  const v = norm(inp.value); if(!v) return; if(fun(v)){ inp.value=''; return; }
-  btn.innerHTML = '<span class="spin"></span>';
-  const PRE = {c6:'c5', c7:'c6', c8:'c7'};
-  for(const ch of SPELL_CH){
-    const c = await tryOpen(ch, v);
-    if(c && PRE[ch] && !content[PRE[ch]]){ btn.textContent='외우기'; msg.className='msg'; msg.textContent='주문이 메아리치지만, 아직 그 문이 열릴 때가 아니다.'; return; }
-    if(c){ content[ch] = c; keys[ch] = v; S.set('keys', keys); btn.textContent='외우기'; inp.value='';
-      msg.className='msg ok'; msg.textContent = '주문이 통했습니다. "' + TITLES[ch] + '" 장이 열립니다.'; if(ch==='c8') SFX.toll(); else SFX.phase(); setClock(PHASE_MIN[ch], 2400); setTimeout(() => { msg.textContent=''; go(ch); }, 1400); return; }
-  }
-  btn.textContent='외우기'; msg.className='msg'; msg.textContent='아무 일도 일어나지 않았다. 붉은 토끼의 목소리를 기다려라.';
-  const r = $('#spell .row'); r.classList.remove('shake'); void r.offsetWidth; r.classList.add('shake');
+// ---------- letter box: a word to the Red Hare (the host reads it); the old secret words still work here ----------
+function castSpell(){
+  const inp = $('#spellIn'), msg = $('#spellMsg'), raw = inp.value.trim(); if(!raw) return;
+  const egg = fun(norm(raw));
+  if(LIVE.N) LIVE.N.push('letters', { text: raw.slice(0, 200), name: S.get('name', '') || '', house: house || '', at: LIVE.N.now() }).catch(() => {});
+  inp.value = ''; if(egg) return;
+  msg.className = 'msg ok'; msg.textContent = LIVE.N ? '붉은 토끼에게 전했습니다.' : '붉은 토끼가 지금은 들을 수 없습니다.';
+  setTimeout(() => { if(msg.textContent) msg.textContent = ''; }, 4000);
 }
 $('#spellBtn').onclick = castSpell;
 $('#spellIn').onkeydown = e => { if(e.key==='Enter') castSpell(); };
 
+
+// one strike of a big church bell: inharmonic partials (hum, prime, tierce, quint, nominal...) each doubled and slightly detuned so it shimmers, plus the clapper's knock
+function bellStrike(A, dest, t, vol = 1, base = 196){
+  [[.5, .5, 9], [1, .75, 7.5], [1.19, .32, 5.5], [1.5, .28, 4.5], [2, .42, 5], [2.5, .16, 3.2], [3, .14, 2.6], [4.07, .09, 1.9], [5.2, .05, 1.3]].forEach(([r, g, d]) => {
+    [-.0016, .0016].forEach(dt => { const o = A.createOscillator(), gn = A.createGain(); o.type = 'sine'; o.frequency.value = base * r * (1 + dt);
+      gn.gain.setValueAtTime(.0001, t); gn.gain.exponentialRampToValueAtTime(g * vol * .5, t + .008); gn.gain.exponentialRampToValueAtTime(.0001, t + d);
+      o.connect(gn); gn.connect(dest); o.start(t); o.stop(t + d + .1); }); });
+  const n = Math.floor(A.sampleRate * .05), b = A.createBuffer(1, n, A.sampleRate), ch = b.getChannelData(0); for(let i = 0; i < n; i++) ch[i] = (Math.random() * 2 - 1) * (1 - i / n);
+  const s = A.createBufferSource(); s.buffer = b; const hp = A.createBiquadFilter(); hp.type = 'bandpass'; hp.frequency.value = 2400; hp.Q.value = .8;
+  const ng = A.createGain(); ng.gain.value = .5 * vol; s.connect(hp); hp.connect(ng); ng.connect(dest); s.start(t);
+}
 // ---------- sound: welcome gate, ticking clock, doors, phase bells ----------
 const SFX = (() => {
   let A = null, master = null, amb = null, on = S.get('sound', true);
@@ -1045,30 +1052,30 @@ const SFX = (() => {
     [131, 196, 262].forEach((f, i) => { const o = A.createOscillator(), og = A.createGain(); o.type = 'sine'; o.frequency.value = f;
       og.gain.setValueAtTime(.0001, tc + i*.1); og.gain.exponentialRampToValueAtTime(.16, tc + i*.1 + .02); og.gain.exponentialRampToValueAtTime(.0001, tc + i*.1 + 2.2);
       o.connect(og); og.connect(out()); o.start(tc + i*.1); o.stop(tc + i*.1 + 2.3); }); };
-  // heavy door: a low wooden clunk-clunk (no creak)
+  // heavy door: an iron latch, two deep wooden clunks, then the door's low boom dying away
   const door = () => { if(!ctx()) return; const T = A.currentTime + .02;
-    [[0, 1], [.16, .7]].forEach(([dt, v]) => { const t = T + dt;
-      [[95, 1, .5], [190, .45, .25], [285, .2, .15]].forEach(([f, gv, d]) => { const o = A.createOscillator(), g = A.createGain(); o.type = 'sine';
-        o.frequency.setValueAtTime(f*1.4, t); o.frequency.exponentialRampToValueAtTime(f*.6, t + d);
-        g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.9*v*gv, t + .006); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    const thud = (t, v, f0, len) => {
+      [[f0, 1, len], [f0 * 2, .45, len * .6], [f0 * 3.1, .2, len * .35]].forEach(([f, gv, d]) => { const o = A.createOscillator(), g = A.createGain(); o.type = 'sine';
+        o.frequency.setValueAtTime(f * 1.4, t); o.frequency.exponentialRampToValueAtTime(f * .6, t + d);
+        g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(v * gv, t + .006); g.gain.exponentialRampToValueAtTime(.0001, t + d);
         o.connect(g); g.connect(out()); o.start(t); o.stop(t + d + .05); });
-      const src = A.createBufferSource(); src.buffer = noiseBuf(.35); const lp = A.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 380;
-      const ng = A.createGain(); ng.gain.setValueAtTime(.0001, t); ng.gain.exponentialRampToValueAtTime(.9*v, t + .008); ng.gain.exponentialRampToValueAtTime(.0001, t + .32);
-      src.connect(lp); lp.connect(ng); ng.connect(out()); src.start(t); src.stop(t + .36); }); };
-  // phase change: a deep bell with shimmering overtones
-  const phase = () => { if(!ctx()) return; const t = A.currentTime;
-    [[98, .5, 4], [196, .25, 3.2], [294, .14, 2.4], [392, .1, 2], [523, .06, 1.6], [737, .04, 1.2]].forEach(([f, v, d]) => {
-      const o = A.createOscillator(), g = A.createGain(); o.type = 'sine'; o.frequency.value = f * (1 + (Math.random()-.5)*.004);
-      g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(v, t + .015); g.gain.exponentialRampToValueAtTime(.0001, t + d);
-      o.connect(g); g.connect(out()); o.start(t); o.stop(t + d + .1); });
-    let tt = t + .5; for(let i=0;i<5;i++){ tick(tt, true, .5); tick(tt + .2, false, .32); tt += .42; } };
+      const src = A.createBufferSource(); src.buffer = noiseBuf(len); const lp = A.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 360;
+      const ng = A.createGain(); ng.gain.setValueAtTime(.0001, t); ng.gain.exponentialRampToValueAtTime(v, t + .008); ng.gain.exponentialRampToValueAtTime(.0001, t + len);
+      src.connect(lp); lp.connect(ng); ng.connect(out()); src.start(t); src.stop(t + len + .02); };
+    // latch: a short bright metal click
+    const lsrc = A.createBufferSource(); lsrc.buffer = noiseBuf(.04); const bp = A.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 3200; bp.Q.value = 4;
+    const lg = A.createGain(); lg.gain.setValueAtTime(.7, T); lg.gain.exponentialRampToValueAtTime(.0001, T + .04); lsrc.connect(bp); bp.connect(lg); lg.connect(out()); lsrc.start(T);
+    thud(T + .18, 1, 92, .55); thud(T + .42, .8, 80, .5);
+    // the door swinging: a long low boom with a slow airy sweep
+    const t2 = T + .7; thud(t2, .55, 55, 1.6);
+    const air = A.createBufferSource(); air.buffer = noiseBuf(1.6); const af = A.createBiquadFilter(); af.type = 'bandpass'; af.Q.value = 1.4;
+    af.frequency.setValueAtTime(260, t2); af.frequency.exponentialRampToValueAtTime(90, t2 + 1.5);
+    const ag = A.createGain(); ag.gain.setValueAtTime(.0001, t2); ag.gain.exponentialRampToValueAtTime(.35, t2 + .25); ag.gain.exponentialRampToValueAtTime(.0001, t2 + 1.6);
+    air.connect(af); af.connect(ag); ag.connect(out()); air.start(t2); air.stop(t2 + 1.62); };
+  // phase change: the big bell, three times - deng, deng, deng
+  const phase = () => { if(!ctx()) return; const t = A.currentTime + .05; for(let k = 0; k < 3; k++) bellStrike(A, out(), t + k * 2, 1.15, 196); };
   // twelve o'clock: the bell tolls six times
-  const toll = () => { if(!ctx()) return; const T = A.currentTime + .1;
-    for(let k=0;k<6;k++){ const t = T + k*1.7;
-      [[82, .55, 4.5], [164, .28, 3.6], [246, .16, 2.8], [330, .1, 2.2], [440, .06, 1.6], [620, .04, 1.2]].forEach(([f, v, d]) => {
-        const o = A.createOscillator(), g = A.createGain(); o.type = 'sine'; o.frequency.value = f * (1 + (Math.random()-.5)*.004);
-        g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(v, t + .012); g.gain.exponentialRampToValueAtTime(.0001, t + d);
-        o.connect(g); g.connect(out()); o.start(t); o.stop(t + d + .1); }); } };
+  const toll = () => { if(!ctx()) return; const t = A.currentTime + .1; for(let k = 0; k < 6; k++) bellStrike(A, out(), t + k * 2.3, 1.25, 174); };
   const set = v => { on = v; S.set('sound', v); ctx(); if(master) master.gain.value = v ? 1 : 0; const b = document.querySelector('#sndBtn'); if(b) b.textContent = v ? '🔊' : '🔇'; };
   return { out, rewind, door, phase, toll, set, get on(){ return on; } };
 })();
@@ -1105,7 +1112,7 @@ sndBtn.onclick = () => SFX.set(!SFX.on); document.body.append(sndBtn);
 const LIVE = { N: null, phase: null, bcSeen: S.get('bcSeen', 0) };
 const L_PHASES = ['arrive','opening','act1','mid','act2','trial','end','party'];
 const L_CH = {mid:'c5', act2:'c6', trial:'c7', end:'c8'};
-const L_EVENT = {c5:['Time Secret','시간의 비밀','이벤트가 발생했습니다.'], c6:['Old Memories','오래된 기억을 모아','2막이 시작되었습니다.'],
+const L_EVENT = {c5:['Interlude','중간 이벤트 발생','붉은 토끼가 시계를 살펴봅니다.'], c6:['Act Two','2막이 시작되었습니다','강가의 망자들이 기억을 팔기 시작합니다.'],
   c7:['The Trial','자정의 재판','재판이 열렸습니다.'], c8:['The Last Bell','자정의 종','종이 울리려 합니다.']};
 const lIdx = p => L_PHASES.indexOf(p);
 const actOpen = () => !LIVE.N || LIVE.phase == null || lIdx(LIVE.phase) >= lIdx('act1');
@@ -1127,21 +1134,16 @@ function needEvent(){
 function checkEvent(){
   const ch = needEvent(), old = $('#evov');
   if(!ch){ if(old) old.remove(); return; }
-  if(old && old.dataset.ch === ch) return; if(old) old.remove();
+  const key = ((LIVE.st || {}).open || {})[ch];
+  if(old && old.dataset.ch === ch && !(old.dataset.wait && key)) return; if(old) old.remove();
   const [k, t, s2] = L_EVENT[ch];
-  const ov = el('div','evov', `<div class="eb"><div class="ek">${k}</div><h2>'${t}'</h2><div class="es">${s2}</div>
-    <p>무대 화면을 보십시오.<br>붉은 토끼가 알려 주는 주문을 적어야<br>다음으로 넘어갈 수 있습니다.</p></div>`);
-  ov.id = 'evov'; ov.dataset.ch = ch;
-  const row = el('div','answer'); const inp = el('input'); inp.placeholder = '주문'; inp.autocomplete = 'off';
-  const btn = el('button','btn','외우기'); const msg = el('div','msg'); row.append(inp, btn); ov.firstChild.append(row, msg);
-  const submit = async () => { const v = norm(inp.value); if(!v) return; btn.innerHTML = '<span class="spin"></span>';
-    const c = await tryOpen(ch, v); btn.textContent = '외우기';
-    if(c){ content[ch] = c; keys[ch] = v; S.set('keys', keys); msg.className = 'msg ok'; msg.textContent = '주문이 통했습니다.';
-      if(ch==='c8') SFX.toll(); else SFX.phase(); setClock(PHASE_MIN[ch], 2400);
-      setTimeout(() => { ov.remove(); go(ch); checkEvent(); }, 1200); }
-    else { row.classList.remove('shake'); void row.offsetWidth; row.classList.add('shake'); msg.className = 'msg'; msg.textContent = '주문이 맞지 않습니다. 무대 화면을 다시 보세요.'; } };
-  btn.onclick = submit; inp.onkeydown = e => { if(e.key==='Enter') submit(); };
-  document.body.append(ov);
+  const ov = el('div','evov', `<div class="eb"><div class="ek">${k}</div><h2>${t}</h2><div class="es">${s2}</div><p class="ew">무대 화면을 보십시오.<br>붉은 토끼가 문을 여는 중입니다...</p></div>`);
+  ov.id = 'evov'; ov.dataset.ch = ch; document.body.append(ov); try{ navigator.vibrate && navigator.vibrate([80, 60, 80]); }catch(e){}
+  if(!key){ ov.dataset.wait = '1'; return; }   // opens as soon as the host's screens publish this page
+  (async () => { const v = norm(key), c = await tryOpen(ch, v), p = ov.querySelector('.ew');
+    if(!c){ p.textContent = '문이 열리지 않습니다. 붉은 토끼를 불러 주세요.'; return; }
+    content[ch] = c; keys[ch] = v; S.set('keys', keys); if(ch==='c8') SFX.toll(); else SFX.phase(); setClock(PHASE_MIN[ch], 2400);
+    const b = el('button','btn','확인'); p.replaceWith(b); b.onclick = () => { ov.remove(); go(ch); checkEvent(); }; })();
 }
 async function inbox(m){
   if(!m) return;

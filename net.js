@@ -104,6 +104,27 @@ export const PHASE_NAME = { arrive: '입장', opening: '오프닝', act1: '1막 
 export const ENVELOPE_MS = 5 * 60e3;
 export const envelopeOn = (st, now) => !!st && st.phase === 'opening' && now - (st.phaseAt || 0) < ENVELOPE_MS && !((st.opGoAt || 0) > (st.phaseAt || 0));
 export const PHASE_CH = { mid: 'c5', act2: 'c6', trial: 'c7', end: 'c8' };
+// after the envelope check the opening shows its title card, then the story pages turn by themselves
+export const CARD_MS = 14000;
+export const OPENING_PAGES = 3;
+export const openingCardStart = st => ((st.opGoAt || 0) > (st.phaseAt || 0) ? st.opGoAt : (st.phaseAt || 0) + ENVELOPE_MS);
+export const openingStoryStart = st => openingCardStart(st) + CARD_MS;
+export const pageSec = cfg => Math.max(20, Number((cfg || {}).openingSec) || 95);
+// which story page is up: counted from the story start, or from the host's last manual turn
+export function openingPageNow(st, cfg, now){
+  const sec = pageSec(cfg) * 1000, s0 = openingStoryStart(st);
+  if(now < s0) return 0;
+  const manual = (st.openingPageAt || 0) > s0;
+  const base = manual ? (st.openingPage || 0) : 0, from = manual ? st.openingPageAt : s0;
+  return Math.max(0, Math.min(OPENING_PAGES - 1, base + Math.floor((now - from) / sec)));
+}
+// when a phase with its own chapter begins, the admin screens publish that chapter's key so every guest's page opens by itself
+export function publishKeys(N, st, keys){
+  if(!st || !keys) return;
+  const open = st.open || {}, up = {};
+  for(const [ph, ch] of Object.entries(PHASE_CH)) if(pIdx(st.phase) >= pIdx(ph) && keys[ch] && open[ch] !== keys[ch]) up[ch] = keys[ch];
+  if(Object.keys(up).length) N.update('state/open', up);
+}
 export const STORY_MIN = { arrive: 420, opening: 420, act1: 420, mid: 500, act2: 510, trial: 719, end: 719, party: 720 };
 export const HOUSES = [
   {k:'spade', s:'♠', n:'스페이드', red:false}, {k:'heart', s:'♥', n:'하트', red:true},
