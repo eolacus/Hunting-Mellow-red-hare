@@ -22,6 +22,10 @@ h2{font-family:'Noto Serif KR',serif; font-size:16px; color:var(--gold2); margin
 h2 small{font-family:'Noto Serif KR',serif; color:var(--mute); font-size:12px; letter-spacing:0}
 button{font:inherit; font-size:13.5px; padding:7px 12px; border-radius:5px; border:1px solid var(--line); background:#24100f; color:var(--ink); cursor:pointer}
 button:hover{border-color:var(--gold)} button.pri{background:var(--red); border-color:var(--red); color:#fff} button.on{background:#3a2a10; border-color:var(--gold); color:var(--gold2)}
+.todo{margin:10px 0 4px; padding:10px 12px; border-left:3px solid var(--gold); background:rgba(201,164,92,.08); font-size:13.5px; line-height:1.7}
+.todo b{color:var(--gold2)} .todo .m{color:#ff9aa4; font-weight:700} .todo .a{color:#9fd8a8; font-weight:700}
+button.next{box-shadow:0 0 0 2px var(--gold); animation:pulseB 1.6s ease-in-out infinite} @keyframes pulseB{50%{box-shadow:0 0 0 4px rgba(201,164,92,.35)}}
+.tt .how{font-size:12px} .tt .how.m{color:#ff9aa4} .tt .how.a{color:#9fd8a8}
 button.danger{border-color:#7a2a2a; color:#ff8a8a}
 input, select, textarea{font:inherit; font-size:14px; background:#0a0405; color:var(--ink); border:1px solid #4a3020; border-radius:5px; padding:6px 8px}
 textarea{width:100%; min-height:64px; resize:vertical}
@@ -67,6 +71,7 @@ ul.ans{margin:0; padding-left:18px; font-size:13.5px} ul.ans li{margin:3px 0}
     <h2>진행 단계 <small id="autoLbl"></small></h2>
     <div class="big" id="phaseBig">-</div>
     <div class="muted" id="phaseSince"></div>
+    <div class="todo" id="todo"></div>
     <div class="phases" id="phaseBtns"></div>
     <div class="row"><button id="prevP">◂ 이전 단계</button><button class="pri" id="nextP">다음 단계 ▸</button><button id="autoBtn"></button></div>
     <div class="muted">타임테이블 시각이 되면 단계가 저절로 넘어갑니다. 일시정지하면 시각이 지나도 멈춰 있고, 재개하면 지금 시각의 단계로 따라잡습니다. 이전 단계로 되돌리면 다음 예정 시각까지는 그 단계에 머뭅니다. 결말과 자유 파티는 늘 손으로 넘깁니다.</div>
@@ -76,7 +81,7 @@ ul.ans{margin:0; padding-left:18px; font-size:13.5px} ul.ans li{margin:3px 0}
     <h2>무대 화면 <small id="stageNow"></small></h2>
     <div class="row"><span class="muted">오프닝 페이지</span><button id="opPrev">◂</button><b id="opNum">1 / 3</b><button id="opNext">▸</button></div>
     <div class="muted">오프닝: 봉투 확인 5분 → Prologue 14초 → 이야기 3장이 저절로 넘어갑니다(한 장당 시간은 타임테이블 아래에서). ◂ ▸로 언제든 넘길 수 있습니다.</div>
-    <div class="muted" style="margin-top:8px">결말 연출 (결말 단계에서 차례로)</div>
+    <div class="muted" style="margin-top:8px">결말 연출 - 결말 단계에서 ① > ② > ③ > ④ 차례로 직접 누릅니다 (빛나는 버튼이 다음 차례)</div>
     <div class="row"><button data-sc="memory">① 인간의 기억</button><button data-sc="vote">② 질문 열기</button><button data-sc="ending">③ 결말 공개</button><button data-sc="thoughts">④ 모두의 생각</button></div>
     <div class="row"><span class="muted">결말</span><select id="verdictMode"><option value="auto">다수결 (같으면 네)</option><option value="yes">"네" 결말로</option><option value="no">"아니오" 결말로</option></select><b id="tally" class="muted"></b></div>
     <div class="muted" style="margin-top:6px">무대에 크게 띄울 말</div>
@@ -98,6 +103,7 @@ ul.ans{margin:0; padding-left:18px; font-size:13.5px} ul.ans li{margin:3px 0}
     <h2>타임테이블 <small>시각을 바꾸면 바로 저장됩니다</small></h2>
     <table class="tt" id="tt"></table>
     <div class="row"><span class="muted">오프닝 이야기 한 장당</span><input type="number" id="opSec" min="20" max="600" step="5" style="width:90px"><span class="muted">초 자동 넘김 (봉투 확인 5분, Prologue 14초는 고정)</span></div>
+    <div class="muted">자동으로 넘어감: 그 시각이 되면 저절로 그 단계로 넘어갑니다. 손으로 넘김: 진행자가 "다음 단계 ▸"를 눌러야 넘어갑니다. 결말 안의 ①~④도 모두 손으로 누릅니다.</div>
     <div class="row"><button id="shiftP">아직 안 온 일정 5분 미루기</button><button id="shiftM">5분 당기기</button></div>
   </section>
 
@@ -160,7 +166,28 @@ $('#phaseBtns').onclick = e => { const p = e.target.dataset.p; if(p && confirm(P
 $('#prevP').onclick = () => { const i = pIdx(st.phase); if(i > 0 && confirm('이전 단계로 되돌릴까요? 다음 예정 시각이 될 때까지는 이 단계에 머뭅니다.')) goPhase(PHASES[i - 1]); };
 $('#nextP').onclick = () => { const i = pIdx(st.phase); if(i < PHASES.length - 1) goPhase(PHASES[i + 1]); };
 $('#autoBtn').onclick = () => setState({ auto: st.auto === false });
+// what the host does now, and how the next step comes (auto = by the timetable, hand = only when you press)
+const TODO = {
+  arrive: ['손님 맞이: 카드, 설정서, 기억 봉투, 동전 1개.', 'auto', '오프닝'],
+  opening: ['봉투 확인 5분 > Prologue > 이야기 3장이 저절로 넘어갑니다. 이야기가 끝나면 쪽지를 쥔 해골을 가리키며 대사, 가문마다 QR 조각.', 'auto', '1막'],
+  act1: ['예약석을 지키며 막힌 가문에 힌트. 시계를 찾은 가문에 자리를 내어 주고 동전 5개.', 'auto', '중간 이벤트'],
+  mid: ['손님 휴대폰에 알림이 저절로 뜹니다. 시계를 살펴보고 "시간의 비밀" 대사.', 'auto', '2막'],
+  act2: ['망자 판매 시작. 20:50쯤 "재판까지 10분 남았습니다."', 'auto', '자정의 재판'],
+  trial: ['메모를 걷어 채점, 모두 기억 봉투 열기, 인간 역을 앞으로.', 'hand', '결말', '채점이 끝나면 "다음 단계 ▸"를 누르세요. 결말은 저절로 넘어가지 않습니다.'],
+  end: ['무대에 "자정의 종". 아래 "결말 연출" 버튼을 ① > ② > ③ > ④ 차례로 직접 누르세요. 저절로 넘어가지 않습니다.', 'hand', '자유 파티', '④까지 끝나고 순위 발표가 끝나면 "다음 단계 ▸".'],
+  party: ['자유 파티. 할 일 끝.', '', ''],
+};
+const SC_ORDER = ['memory', 'vote', 'ending', 'thoughts'];
+function renderTodo(){
+  const p = st.phase || 'arrive', [what, how, nxt, note] = TODO[p] || ['', '', ''], seg = (cfg.schedule || {})[PHASES[pIdx(p) + 1]] || {};
+  const auto = how === 'auto' && seg.auto !== false && st.auto !== false;
+  const next = !nxt ? '' : auto ? `<span class="a">자동</span> ${esc(seg.time || '')}에 "${nxt}"(으)로 저절로 넘어갑니다.` : `<span class="m">손으로</span> ${note ? esc(note) : '"다음 단계 ▸"를 눌러야 "' + nxt + '"(으)로 넘어갑니다.'}`;
+  $('#todo').innerHTML = `<b>지금 할 일</b> ${esc(what)}${next ? '<br><b>다음</b> ' + next : ''}`;
+  const i = SC_ORDER.indexOf(st.stageScene || ''), want = p === 'end' ? SC_ORDER[i + 1] : null;
+  document.querySelectorAll('[data-sc]').forEach(b => b.classList.toggle('next', b.dataset.sc === want));
+}
 function renderPhase(){
+  renderTodo();
   const p = st.phase || 'arrive';
   $('#hPhase').textContent = PHASE_NAME[p]; $('#phaseBig').textContent = PHASE_NAME[p];
   $('#phaseSince').textContent = st.phaseAt ? fmtClock(st.phaseAt) + '부터' : '';
@@ -249,10 +276,10 @@ function renderTT(){
   const rows = PHASES.filter(p => S[p]).map(p => { const e = S[p];
     return `<tr class="${p === st.phase ? 'cur' : ''}" data-p="${p}"><td>${esc(e.label || PHASE_NAME[p])}</td>
       <td><input type="time" value="${esc(e.time)}" data-k="time"></td>
-      <td><label class="muted"><input type="checkbox" data-k="auto" ${e.auto ? 'checked' : ''}> 자동</label></td>
+      <td><label><input type="checkbox" data-k="auto" ${e.auto ? 'checked' : ''}> <span class="how ${e.auto ? 'a' : 'm'}">${e.auto ? '자동으로 넘어감' : '손으로 넘김'}</span></label></td>
       <td><select data-k="bgm"></select></td></tr>`; }).join('');
   if(document.activeElement && $('#tt').contains(document.activeElement)) return;
-  $('#tt').innerHTML = '<tr><td class="muted">단계</td><td class="muted">시작</td><td class="muted">자동</td><td class="muted">BGM</td></tr>' + rows;
+  $('#tt').innerHTML = '<tr><td class="muted">단계</td><td class="muted">시작</td><td class="muted">넘어가는 방법</td><td class="muted">BGM</td></tr>' + rows;
   $('#tt').querySelectorAll('tr[data-p]').forEach(tr => fillTracks(tr.querySelector('select'), S[tr.dataset.p].bgm, '음악 없음'));
   if(document.activeElement !== $('#opSec')) $('#opSec').value = pageSec(cfg);
 }
@@ -325,7 +352,7 @@ $('#ansT').onclick = () => { const a = $('#ans'); a.hidden = !a.hidden; $('#ansT
 function renderAns(){
   const k = host.keys || {}, s = host.seals || {};
   $('#ans').innerHTML = `<ul class="ans">${(host.answers || []).map(x => `<li>${esc(x)}</li>`).join('')}
-    <li>주문: 시간의 비밀 "${esc(k.c5)}" / 2막 "${esc(k.c6)}" / 재판 "${esc(k.c7)}" / 엔딩 "${esc(k.c8)}"</li>
+    <li>단계 열쇠(손님 화면이 자동으로 엽니다): 시간의 비밀 "${esc(k.c5)}" / 2막 "${esc(k.c6)}" / 재판 "${esc(k.c7)}" / 엔딩 "${esc(k.c8)}"</li>
     <li>인장: ${HOUSES.map(h => h.s + ' ' + esc(s[h.k] || '')).join(' / ')}</li></ul>`;
 }
 
@@ -339,13 +366,20 @@ function tick(){ const now = N.now(); $('#hClock').textContent = fmtClock(now); 
   $('#hNext').innerHTML = nx ? `다음 <b>${esc(nx.label)}</b> ${fmtLeft(nx.t - now)}` : '다음 일정 없음'; }
 const all = () => { renderTally(); renderPhase(); renderBgm(); renderTT(); renderPlayers(); renderNpc(); };
 N.on('state', v => { st = v || {}; all(); publishKeys(N, st, host.keys); });
-let migrated = false;
+let migrated = false, migrated1030 = false;
 N.on('config', v => { cfg = v || {};
   // a seed from the manual-only build has every row switched off: turn the timetable back on once
   const sc = cfg.schedule || {}, rows = Object.values(sc);
   if(!migrated && rows.length && rows.every(e => e && e.auto === false)){ migrated = true;
     const up = {}; for(const [k, e] of Object.entries(sc)) if(!['end', 'party'].includes(e.phase || k)) up[k + '/auto'] = true;
     N.update('config/schedule', up); setState({ auto: true }); }
+  // 10/30 timetable (opening 19:00, act 1 and act 2 ten minutes longer): applied once, music choices kept
+  if(!migrated1030 && rows.length && cfg.schedVer !== '1030'){ migrated1030 = true;
+    const T = { arrive: '18:40', opening: '19:00', act1: '19:10', mid: '20:10', act2: '20:20', trial: '21:00', end: '21:15', party: '21:25' }, up = {};
+    for(const [k, t] of Object.entries(T)) if(sc[k]) up['schedule/' + k + '/time'] = t;
+    up.schedVer = '1030'; N.update('config', up);
+    N.update('npcdata/cat', { name: '체셔 고양이' }); N.update('npcdata/hatter', { name: '모자 장수' });
+    toast('새 타임테이블(오프닝 19:00)을 적용했습니다'); }
   all(); });
 N.on('players', v => { players = v || {}; renderPlayers(); });
 N.on('npc', v => { npc = v || {}; renderNpc(); });
