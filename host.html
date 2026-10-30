@@ -22,6 +22,9 @@ h2{font-family:'Noto Serif KR',serif; font-size:16px; color:var(--gold2); margin
 h2 small{font-family:'Noto Serif KR',serif; color:var(--mute); font-size:12px; letter-spacing:0}
 button{font:inherit; font-size:13.5px; padding:7px 12px; border-radius:5px; border:1px solid var(--line); background:#24100f; color:var(--ink); cursor:pointer}
 button:hover{border-color:var(--gold)} button.pri{background:var(--red); border-color:var(--red); color:#fff} button.on{background:#3a2a10; border-color:var(--gold); color:var(--gold2)}
+.trh{display:grid; grid-template-columns:1.6em 1fr auto; gap:2px 8px; align-items:start; padding:7px 0; border-bottom:1px solid rgba(201,164,92,.12); font-size:13px}
+.trh .s{font-size:18px} .trh .s.r{color:#ff6b78} .trh .c{font-size:18px; color:var(--gold2); font-weight:700}
+.trh .ok{color:#9fd8a8} .trh .no{color:#ff9aa4} .trh small{color:var(--mute)}
 .todo{margin:10px 0 4px; padding:10px 12px; border-left:3px solid var(--gold); background:rgba(201,164,92,.08); font-size:13.5px; line-height:1.7}
 .todo b{color:var(--gold2)} .todo .m{color:#ff9aa4; font-weight:700} .todo .a{color:#9fd8a8; font-weight:700}
 button.next{box-shadow:0 0 0 2px var(--gold); animation:pulseB 1.6s ease-in-out infinite} @keyframes pulseB{50%{box-shadow:0 0 0 4px rgba(201,164,92,.35)}}
@@ -61,7 +64,7 @@ ul.ans{margin:0; padding-left:18px; font-size:13.5px} ul.ans li{margin:3px 0}
 </head>
 <body>
 <header>
-  <div class="brand">Red Hare · 진행자 패널</div>
+  <div class="brand">Red Hare / 진행자 패널</div>
   <span class="pill">지금 <b id="hClock">--:--</b></span>
   <span class="pill">단계 <b id="hPhase">-</b></span>
   <span class="pill" id="hNext"></span>
@@ -92,6 +95,14 @@ ul.ans{margin:0; padding-left:18px; font-size:13.5px} ul.ans li{margin:3px 0}
   </section>
 
   <section>
+    <h2>자정의 재판 <small id="trStep"></small></h2>
+    <div class="muted">재판 단계가 되면 제목 화면 14초 뒤부터 저절로: 각자 의견 2분 > 가문 안에서 투표 1분 > 가장 많이 투표받은 의견이 가문의 답. 인간과 잘못은 자동 채점, 숨긴 이유(주관식)는 자동 추정 후 ✓ / ✗로 고칠 수 있습니다. 확인하고 "승인"을 누르면 무대와 손님 화면에 결과와 동전이 뜹니다.</div>
+    <div id="trHouses"></div>
+    <div class="row"><button class="pri" id="trOk">✓ 승인하고 결과 공개</button><button id="trHide">결과 내리기</button></div>
+    <div class="row"><button id="trRestart">처음부터 다시 (2분 + 1분)</button><button id="trAgree">투표 1분으로 바로</button><button id="trClose">지금 마감</button></div>
+  </section>
+
+  <section>
     <h2>BGM <small id="bgmNow"></small></h2>
     <div class="row"><button id="bgmPlay"></button><span class="muted">볼륨</span><input type="range" id="vol" min="0" max="1" step="0.05" style="flex:1"></div>
     <div class="row"><select id="ovr" style="flex:1"></select><button id="ovrBtn">지금 이 곡 틀기</button></div>
@@ -110,7 +121,7 @@ ul.ans{margin:0; padding-left:18px; font-size:13.5px} ul.ans li{margin:3px 0}
   </section>
 
   <section class="wide">
-    <h2>참석자 <small>카드를 누르면 메시지 · 문 열어주기 · 초기화</small></h2>
+    <h2>참석자 <small>카드를 누르면 메시지 / 문 열어주기 / 초기화</small></h2>
     <div class="stats" id="pStats"></div>
     <div class="row filter" id="pFilter"></div>
     <div class="grid" id="pGrid"></div>
@@ -146,6 +157,7 @@ ul.ans{margin:0; padding-left:18px; font-size:13.5px} ul.ans li{margin:3px 0}
   </section>
 </main>
 <script type="module">
+import { trialStart, trialStep, houseAnswer, cardLabel, whyLabel, badLabel, TRIAL_PROP, TRIAL_AGREE } from './net.js';
 import { connect, login, LOGIN_CSS, envelopeOn, openingPageNow, openingStoryStart, publishKeys, pageSec, CARD_MS, PHASES, PHASE_NAME, HOUSES, TITLES, pIdx, atToday, autoAdvance, nextEntry, fmtClock, fmtLeft, esc } from './net.js';
 document.head.append(Object.assign(document.createElement('style'), {textContent: LOGIN_CSS}));
 const $ = s => document.querySelector(s);
@@ -171,11 +183,11 @@ $('#autoBtn').onclick = () => setState({ auto: st.auto === false });
 // what the host does now, and how the next step comes (auto = by the timetable, hand = only when you press)
 const TODO = {
   arrive: ['손님 맞이: 카드, 설정서, 기억 봉투, 동전 1개.', 'auto', '오프닝'],
-  opening: ['봉투 확인 5분 > Prologue > 이야기 3장이 저절로 넘어갑니다. 이야기가 끝나면 쪽지를 쥔 해골을 가리키며 대사, 가문마다 QR 조각.', 'auto', '1막'],
+  opening: ['봉투 확인 5분 > Prologue > 이야기 3장이 저절로 넘어갑니다. 이야기가 끝나면 대사, 가문마다 QR 조각.', 'auto', '1막'],
   act1: ['예약석을 지키며 막힌 가문에 힌트. 시계를 찾은 가문에 자리를 내어 주고 동전 5개.', 'auto', '중간 이벤트'],
   mid: ['손님 휴대폰에 알림이 저절로 뜹니다. 시계를 살펴보고 "시간의 비밀" 대사.', 'auto', '2막'],
   act2: ['망자 판매 시작. 20:50쯤 "재판까지 10분 남았습니다."', 'auto', '자정의 재판'],
-  trial: ['메모를 걷어 채점, 모두 기억 봉투 열기, 인간 역을 앞으로.', 'hand', '결말', '채점이 끝나면 "다음 단계 ▸"를 누르세요. 결말은 저절로 넘어가지 않습니다.'],
+  trial: ['손님들이 휴대폰으로 의견 2분 > 가문 투표 1분. 끝나면 아래 "자정의 재판" 칸에서 자동 채점을 보고 "승인". 그동안 모두 기억 봉투 열기, 인간 역을 앞으로.', 'hand', '결말', '결과를 승인한 뒤 "다음 단계 ▸"를 누르세요. 결말은 저절로 넘어가지 않습니다.'],
   end: ['무대에 "자정의 종". 아래 "결말 연출" 버튼을 ① > ② > ③ > ④ 차례로 직접 누르세요. 저절로 넘어가지 않습니다.', 'hand', '자유 파티', '④까지 끝나고 순위 발표가 끝나면 "다음 단계 ▸".'],
   party: ['자유 파티. 할 일 끝.', '', ''],
 };
@@ -200,7 +212,7 @@ function renderTodo(){
   } else if(['act1', 'mid', 'act2', 'trial'].includes(p) && since < CARD_MS) stage = `단계 제목 화면, <b>${sec(CARD_MS - since)}</b> 남음`;
   if(p === 'mid'){ const n = (host.midmurmurs || []).length, end = CARD_MS + (1.5 + n * 4 + 2) * 1000;
     stage += (stage ? ' > ' : '') + (since < end ? `요괴들의 웅성거림 ${n}줄이 4초마다 하나씩, 끝나기까지 <b>${sec(end - since)}</b>` : '웅성거림이 모두 떴습니다'); }
-  if(p === 'mid' && since < 31000) stage += ' (교회 종소리 약 30초)';
+  if(['mid', 'trial'].includes(p) && since < 31000) stage += ' (교회 종소리 약 30초)';
   if(p === 'trial'){ const n = (host.murmurs || []).length, end = CARD_MS + (1.5 + n * 4 + 2) * 1000;
     stage += (stage ? ' > ' : '') + (since < end ? `재판 웅성거림 ${n}줄, 끝나기까지 <b>${sec(end - since)}</b>` : '웅성거림이 모두 떴습니다'); }
   if(p === 'end' && !st.stageScene) stage = '"자정의 종" 화면' + (since < 31000 ? `, 교회 종소리 <b>${sec(31000 - since)}</b> 남음` : '') + '. 이제 ① 인간의 기억을 누르세요.';
@@ -219,7 +231,7 @@ function renderPhase(){
   $('#autoLbl').textContent = st.auto === false ? '일시정지됨' : '타임테이블 자동';
   document.querySelectorAll('[data-sc]').forEach(b => b.classList.toggle('on', st.phase === 'end' && st.stageScene === b.dataset.sc));
   const now = N.now();
-  $('#opNum').textContent = st.phase !== 'opening' ? '오프닝 아님' : envelopeOn(st, now) ? '설정서 확인 중 (▸ 누르면 다음)' : now < openingStoryStart(st) ? 'Prologue 화면 (▸ 누르면 이야기)' : (openingPageNow(st, cfg, now) + 1) + ' / 3 · 자동 ' + pageSec(cfg) + '초';
+  $('#opNum').textContent = st.phase !== 'opening' ? '오프닝 아님' : envelopeOn(st, now) ? '설정서 확인 중 (▸ 누르면 다음)' : now < openingStoryStart(st) ? 'Prologue 화면 (▸ 누르면 이야기)' : (openingPageNow(st, cfg, now) + 1) + ' / 3 / 자동 ' + pageSec(cfg) + '초';
   $('#bgmPlay').textContent = st.bgmPlaying === false ? '▶ 음악 켜기' : '⏸ 음악 끄기';
 }
 
@@ -233,15 +245,50 @@ $('#opNext').onclick = () => { const now = N.now(); if(st.phase !== 'opening') r
 setInterval(() => { if(st.phase === 'opening') renderPhase(); }, 5000);
 let votes = {}, thoughtsN = 0;
 const tally = () => { const vs = Object.values(votes); return { y: vs.filter(v => v.v === 'yes').length, n: vs.filter(v => v.v === 'no').length }; };
-function renderTally(){ const t = tally(); $('#tally').textContent = `네 ${t.y} · 아니오 ${t.n} · 생각 ${thoughtsN}개` + (st.verdict ? ` · 공개된 결말: ${st.verdict === 'yes' ? '네' : '아니오'}` : ''); }
+function renderTally(){ const t = tally(); $('#tally').textContent = `네 ${t.y} / 아니오 ${t.n} / 생각 ${thoughtsN}개` + (st.verdict ? ` / 공개된 결말: ${st.verdict === 'yes' ? '네' : '아니오'}` : ''); }
 N.on('votes', v => { votes = v || {}; renderTally(); });
+// ---------- the midnight trial: auto grading (answers kept as hashes so this page does not give them away) ----------
+let trial = {}, trialGrades = {};
+const TRIAL_H = { q1: '6fe0a0b14be4d929d5bce19bd7840a894a9af547d18cf89589a9857ff68b147d', q3: 'ef9a6a6a4c28758ed8f560286d23a74e7b3cf83fc06d001424fa38ac7d3f8e49' };
+const sha = async t => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)))].map(b => b.toString(16).padStart(2, '0')).join('');
+// the reason is written freely: a keyword guess marks it, and the host can flip it with ✓ / ✗ (saved at trial/q2/<house>)
+const WHY_HINTS = ['돌아가기 싫', '가기 싫', '가고 싶지 않', '남고 싶', '남으려', '남아 있고', '머물', '끝나지 않', '끝나지않', '안 끝나', '끝나는 게 싫', '계속되', '잊', '외로', '따뜻', '즐거', '행복', '친구', '여기 있', '떠나기 싫'];
+const whyGuess = t => WHY_HINTS.some(k => (t || '').replace(/\s+/g, ' ').includes(k));
+async function gradeAll(){
+  const out = {};
+  for(const h of HOUSES){ const a = houseAnswer(trial, h.k);
+    if(!a){ out[h.k] = { none: true, q1: false, q2: false, q3: false, coins: 0 }; continue; }
+    const q1 = await sha('hmrh|q1|' + a.s + '|' + a.r) === TRIAL_H.q1, q3 = await sha('hmrh|q3|' + (a.bad || []).slice().sort().join(',')) === TRIAL_H.q3;
+    const set = ((trial.q2 || {})[h.k] || {}), q2 = set.uid === a.uid && typeof set.ok === 'boolean' ? set.ok : whyGuess(a.why);
+    out[h.k] = { s: a.s || '', r: a.r || '', why: a.why || '', bad: a.bad || [], by: a.name || '', uid: a.uid, votes: a.votes || 0, how: a.how, q1, q2, q2set: set.uid === a.uid && typeof set.ok === 'boolean', q3, coins: (q1 ? 3 : 0) + (q2 ? 2 : 0) + (q3 ? 3 : 0) }; }
+  trialGrades = out; renderTrial();
+}
+function renderTrial(){
+  const [step, left] = trialStep(st, N.now()), lab = { wait: '시작 전', prop: '각자 의견 제출 중', agree: '가문 투표 중', closed: st.phase === 'trial' ? '마감됨' : '재판 단계 아님' }[step];
+  $('#trStep').textContent = lab + (left ? ', ' + fmtLeft(left) : '') + (st.trialResult ? ', 결과 공개 중' : '');
+  const props = Object.values(trial.props || {}), vts = Object.values(trial.votes || {});
+  $('#trHouses').innerHTML = HOUSES.map(h => { const g = trialGrades[h.k] || {}, n = props.filter(p => p.house === h.k).length, v = vts.filter(x => x.house === h.k).length, m = Object.values(players).filter(p => p.house === h.k).length;
+    const mk = ok => ok ? '<span class="ok">✓</span>' : '<span class="no">✗</span>';
+    return `<div class="trh"><span class="s${h.red ? ' r' : ''}">${h.s}</span><div>의견 ${n}, 투표 ${v} (가문 ${m}명)<br>${g.none ? '아직 답 없음' : (g.how === 'vote' ? `가장 많이 투표받은 답 ${g.votes}표` : '투표가 없어 처음 낸 의견') + (g.by ? ', ' + esc(g.by) : '')}
+      ${g.none ? '' : `<br>${mk(g.q1)} 인간: ${esc(cardLabel(g))}<br>${mk(g.q3)} 잘못: ${esc(badLabel(g))}<br>${mk(g.q2)} 이유: <small>"${esc(whyLabel(g))}"</small> ${g.q2set ? '(직접 판정)' : '(자동 추정)'}
+        <button data-q2="${h.k}" data-ok="1">✓ 맞음</button> <button data-q2="${h.k}" data-ok="0">✗ 틀림</button>`}</div><span class="c">+${g.coins || 0}</span></div>`; }).join('');
+}
+$('#trHouses').onclick = e => { const b = e.target.closest('[data-q2]'); if(!b) return; const g = trialGrades[b.dataset.q2] || {}; if(!g.uid) return;
+  N.set('trial/q2/' + b.dataset.q2, { uid: g.uid, ok: b.dataset.ok === '1' }); toast('숨긴 이유를 ' + (b.dataset.ok === '1' ? '맞음' : '틀림') + '으로 정했습니다'); };
+N.on('trial', v => { trial = v || {}; gradeAll(); });
+setInterval(renderTrial, 1000);
+$('#trOk').onclick = async () => { await gradeAll(); if(!confirm('이 결과를 무대와 손님 화면에 공개할까요?')) return; setState({ trialResult: { at: N.now(), houses: trialGrades } }); toast('재판 결과를 공개했습니다'); };
+$('#trHide').onclick = () => setState({ trialResult: null });
+$('#trRestart').onclick = () => { if(confirm('재판 시간을 처음부터 다시 시작할까요? (제출된 의견은 남습니다)')) setState({ trialAt: N.now(), trialFor: st.phaseAt }); };
+$('#trAgree').onclick = () => setState({ trialAt: N.now() - TRIAL_PROP, trialFor: st.phaseAt });
+$('#trClose').onclick = () => setState({ trialAt: N.now() - TRIAL_PROP - TRIAL_AGREE, trialFor: st.phaseAt });
 N.on('thoughts', v => { thoughtsN = Object.keys(v || {}).length; renderTally(); });
 document.querySelectorAll('[data-sc]').forEach(b => b.onclick = () => {
   const sc = b.dataset.sc, o = { stageScene: sc };
   if(st.phase !== 'end'){ if(!confirm('결말 단계로 넘기고 진행할까요?')) return; Object.assign(o, { phase: 'end', phaseAt: N.now() }); }
   if(sc === 'vote') o.voteOpen = true;
   if(sc === 'ending'){ const t = tally(), m = $('#verdictMode').value, v = m === 'auto' ? (t.y >= t.n ? 'yes' : 'no') : m;
-    if(!confirm(`네 ${t.y} · 아니오 ${t.n}\n"${v === 'yes' ? '네' : '아니오'}" 결말을 공개할까요?`)) return; Object.assign(o, { verdict: v, voteOpen: false }); }
+    if(!confirm(`네 ${t.y} / 아니오 ${t.n}\n"${v === 'yes' ? '네' : '아니오'}" 결말을 공개할까요?`)) return; Object.assign(o, { verdict: v, voteOpen: false }); }
   setState(o); toast(b.textContent.trim());
 });
 $('#stageSend').onclick = () => { const t = $('#stageText').value.trim(); if(!t) return; setState({ stageMsg: { text: t, at: N.now() } }); toast('무대에 띄웠습니다'); };
@@ -288,7 +335,7 @@ function renderBgm(){
   renderUploads();
   const seg = (cfg.schedule || {})[st.phase] || {};
   const want = cfg.bgmOverride || seg.bgm || '';
-  $('#bgmNow').textContent = (st.bgmPlaying === false ? '멈춤 · ' : '') + (cfg.bgmOverride ? '직접 고른 곡: ' : '일정: ') + trackName(want);
+  $('#bgmNow').textContent = (st.bgmPlaying === false ? '멈춤 / ' : '') + (cfg.bgmOverride ? '직접 고른 곡: ' : '일정: ') + trackName(want);
   if(document.activeElement !== $('#vol')) $('#vol').value = cfg.volume ?? .7;
   if(document.activeElement !== $('#ovr')) fillTracks($('#ovr'), cfg.bgmOverride, '곡 고르기');
 }
@@ -334,14 +381,14 @@ function renderPlayers(){
       <div class="nm">${h ? `<span class="s ${h.red ? 'red' : ''}">${h.s}</span>` : '<span class="s">·</span>'}${esc(p.name)}</div>
       <div class="cur">${esc(TITLES[p.cur] || p.cur || '')}</div>
       <div class="dots">${CH_ORDER.map(c => `<i class="${has(p, c) ? 'y' : ''}" title="${TITLES[c]}"></i>`).join('')}</div>
-      <div class="meta">기억 ${p.ghosts || 0} · 인장 ${p.seals || 0} · ${ago(p.at)}</div></div>`; }).join('') || '<div class="muted">아직 들어온 손님이 없습니다.</div>';
+      <div class="meta">기억 ${p.ghosts || 0} / 인장 ${p.seals || 0} / ${ago(p.at)}</div></div>`; }).join('') || '<div class="muted">아직 들어온 손님이 없습니다.</div>';
 }
 $('#pGrid').onclick = e => { const c = e.target.closest('.pc'); if(c) sheet(c.dataset.id); };
 function sheet(id){
   const p = players[id]; if(!p) return; const h = HOUSES.find(x => x.k === p.house);
   const d = document.createElement('div'); d.className = 'sheet';
   const next = CH_ORDER.find(c => !has(p, c));
-  d.innerHTML = `<div class="sb"><h3>${h ? h.s + ' ' : ''}${esc(p.name)}</h3><div class="muted">${p.online ? '접속 중' : '접속 끊김'} · 지금 ${esc(TITLES[p.cur] || '')}</div>
+  d.innerHTML = `<div class="sb"><h3>${h ? h.s + ' ' : ''}${esc(p.name)}</h3><div class="muted">${p.online ? '접속 중' : '접속 끊김'} / 지금 ${esc(TITLES[p.cur] || '')}</div>
     <textarea placeholder="이 손님에게만 보낼 메시지"></textarea><div class="row"><button class="pri" data-a="msg">메시지 보내기</button></div>
     <div class="row"><select>${CH_ORDER.map(c => `<option value="${c}" ${c === next ? 'selected' : ''}>${TITLES[c]}${has(p, c) ? ' (열림)' : ''}</option>`).join('')}</select><button data-a="unlock">이 문 열어주기</button></div>
     <div class="row"><button class="danger" data-a="reset">이 손님 화면 초기화</button><button class="danger" data-a="del">명단에서 지우기</button></div>
@@ -364,9 +411,9 @@ $('#bcSend').onclick = async () => { const t = $('#bcText').value.trim(); if(!t)
 function renderNpc(){
   const parts = [], log = [];
   for(const g of ['cat', 'hatter']){ const d = npcdata[g] || {}, sales = Object.values((npc[g] || {}).sales || {});
-    parts.push(`<div style="margin-bottom:8px"><b style="color:var(--gold2)">${esc(d.name || g)}</b> <span class="muted">${(npc[g] || {}).online ? '· 접속 중' : '· 미접속'} · 받은 은화 ${sales.length * 3}닢</span>
+    parts.push(`<div style="margin-bottom:8px"><b style="color:var(--gold2)">${esc(d.name || g)}</b> <span class="muted">${(npc[g] || {}).online ? '· 접속 중' : '· 미접속'} / 받은 은화 ${sales.length * 3}닢</span>
       ${(d.mems || []).map((m, i) => { const ss = sales.filter(s => s.mem === i);
-        return `<div class="mem"><span>${i + 1}. ${esc(m.title)} <span class="muted">(${esc(m.word)})</span></span><span>${HOUSES.map(h => h.s + (ss.filter(s => s.house === h.k).length)).join(' ')} · <b>${ss.length}</b></span></div>`; }).join('')}</div>`);
+        return `<div class="mem"><span>${i + 1}. ${esc(m.title)} <span class="muted">(${esc(m.word)})</span></span><span>${HOUSES.map(h => h.s + (ss.filter(s => s.house === h.k).length)).join(' ')} / <b>${ss.length}</b></span></div>`; }).join('')}</div>`);
     sales.forEach(s => log.push([s.at, `${fmtClock(s.at)} ${esc(d.name || g)} → ${(HOUSES.find(h => h.k === s.house) || {}).s || ''} ${esc((d.mems || [])[s.mem]?.title || '')}`])); }
   $('#npcSum').innerHTML = parts.join(''); $('#npcLog').innerHTML = log.sort((a, b) => b[0] - a[0]).map(x => x[1]).join('<br>');
 }
@@ -382,8 +429,8 @@ function renderAns(){
 
 // ---------- tools ----------
 $('#wipe').onclick = async () => { if(!confirm('게임 기록을 모두 지울까요? (참석자 명단, 진행, 판매 기록, 공지)')) return;
-  await Promise.all(['players', 'npc', 'broadcast', 'votes', 'thoughts', 'letters'].map(p => N.remove(p)));
-  await N.update('state', { phase: 'arrive', phaseAt: N.now(), stageScene: '', showSpell: false, stageMsg: null, openingPage: 0, openingPageAt: 0, opGoAt: 0, open: null, verdict: null, voteOpen: false }); toast('초기화했습니다'); };
+  await Promise.all(['players', 'npc', 'broadcast', 'votes', 'thoughts', 'letters', 'trial'].map(p => N.remove(p)));
+  await N.update('state', { phase: 'arrive', phaseAt: N.now(), stageScene: '', showSpell: false, stageMsg: null, openingPage: 0, openingPageAt: 0, opGoAt: 0, open: null, verdict: null, voteOpen: false, trialAt: 0, trialResult: null }); toast('초기화했습니다'); };
 
 // ---------- live ----------
 function tick(){ renderTodo(); const now = N.now(); $('#hClock').textContent = fmtClock(now); const nx = nextEntry(cfg.schedule, now, st.phase);

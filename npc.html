@@ -59,7 +59,7 @@ function start(){ if(!presenceOn){ N.presence('npc/' + me + '/online', true, fal
 function status(){
   const ph = st.phase || 'arrive', now = N.now();
   if(pIdx(ph) < pIdx('act2')) return ['wait', '아직 판매 시간이 아닙니다. 2막(' + ((cfg.schedule || {}).act2 || {}).time + ')부터 강가에 나타나세요.'];
-  if(ph === 'act2'){ const end = atToday(((cfg.schedule || {}).trial || {}).time, now); return ['open', '지금 기억을 팝니다 · 재판까지 ' + fmtLeft(end - now)]; }
+  if(ph === 'act2'){ const end = atToday(((cfg.schedule || {}).trial || {}).time, now); return ['open', '지금 기억을 팝니다 / 재판까지 ' + fmtLeft(end - now)]; }
   return ['done', '판매가 끝났습니다. 배가 뜰 시간을 기다리세요.'];
 }
 function render(){
@@ -70,7 +70,7 @@ function render(){
     <div class="hello">${esc(d.hello)}</div>
     <div class="rule"><b>은화 세 닢</b>을 받으면, 손님이 고른 기억의 <b>단어 하나</b>만 귓속말로 알려 주세요. 동전 없이 말을 걸면 인사말만 합니다. 팔고 나면 아래에서 <b>산 가문</b>을 눌러 기록해 주세요.</div>
     ${d.mems.map((m, i) => { const n = sales.filter(([, s]) => s.mem === i).length;
-      return `<div class="mem"><div class="t"><b>기억 ${i + 1} · ${esc(m.title)}</b><span>팔린 횟수 ${n}</span></div><div class="w">${esc(m.word)}</div>
+      return `<div class="mem"><div class="t"><b>기억 ${i + 1} / ${esc(m.title)}</b><span>팔린 횟수 ${n}</span></div><div class="w">${esc(m.word)}</div>
         <details><summary>기억 내용 보기 (연기 참고용)</summary>${esc(m.text)}</details>
         <div class="sell">${HOUSES.map(h => `<button class="${h.red ? 'r' : ''}" data-m="${i}" data-h="${h.k}">${h.s}<small>${h.n}</small></button>`).join('')}</div></div>`; }).join('')}
     <div class="sum">받은 은화 <b>${sales.length * 3}</b>닢</div>

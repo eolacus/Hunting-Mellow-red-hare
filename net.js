@@ -107,6 +107,30 @@ export const PHASE_CH = { mid: 'c5', act2: 'c6', trial: 'c7', end: 'c8' };
 // after the envelope check the opening shows its title card, then the story pages turn by themselves
 export const CARD_MS = 14000;
 export const OPENING_PAGES = 3;
+// ---------- the midnight trial: everyone proposes (2 min), each house settles on one (1 min), the Red Hare approves ----------
+export const TRIAL_PROP = 120000, TRIAL_AGREE = 60000;
+export const RANKS = ['2', '7', 'A', 'J', 'Q', 'K'];
+export const trialStart = st => (st.trialAt && st.trialFor === st.phaseAt ? st.trialAt : (st.phaseAt || 0) + CARD_MS);   // the host's restart/skip only counts for this trial
+// ['wait' | 'prop' | 'agree' | 'closed', ms left in this step]
+export function trialStep(st, now){
+  if(!st || st.phase !== 'trial') return ['closed', 0];
+  const s = trialStart(st);
+  if(now < s) return ['wait', s - now];
+  if(now < s + TRIAL_PROP) return ['prop', s + TRIAL_PROP - now];
+  if(now < s + TRIAL_PROP + TRIAL_AGREE) return ['agree', s + TRIAL_PROP + TRIAL_AGREE - now];
+  return ['closed', 0];
+}
+// the answer a house hands in: the proposal its members voted for most (ties: the one handed in first); no votes: the first proposal
+export function voteCount(trial, uid){ return Object.values((trial || {}).votes || {}).filter(v => v && v.for === uid).length; }
+export function houseAnswer(trial, h){
+  const props = Object.entries((trial || {}).props || {}).filter(([, p]) => p && p.house === h); if(!props.length) return null;
+  const ranked = props.map(([uid, p]) => ({ ...p, uid, votes: voteCount(trial, uid) })).sort((a, b) => (b.votes - a.votes) || (a.at - b.at));
+  return { ...ranked[0], how: ranked[0].votes ? 'vote' : 'first' };
+}
+export const SUIT_OF = { spade: '♠', heart: '♥', clover: '♣', diamond: '♦' };
+export const cardLabel = a => a && a.s ? SUIT_OF[a.s] + ' ' + (a.r || '?') : '-';
+export const whyLabel = a => ((a || {}).why || '').trim() || '-';
+export const badLabel = a => (a && a.bad && a.bad.length) ? ['spade', 'heart', 'diamond', 'clover'].filter(h => a.bad.includes(h)).map(h => SUIT_OF[h]).join(' ') : '-';
 export const openingCardStart = st => ((st.opGoAt || 0) > (st.phaseAt || 0) ? st.opGoAt : (st.phaseAt || 0) + ENVELOPE_MS);
 export const openingStoryStart = st => openingCardStart(st) + CARD_MS;
 export const pageSec = cfg => Math.max(20, Number((cfg || {}).openingSec) || 95);

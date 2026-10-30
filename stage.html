@@ -74,6 +74,17 @@ h1 .red{color:var(--red2)}
 .op p.clo{text-align:center; text-indent:0; color:var(--red2); font-weight:700}
 .op .pg{text-align:center; color:var(--gold); letter-spacing:1vh; margin-top:2vh}
 /* houses */
+.trq{margin:2vh 0 1vh; font-family:'Noto Serif KR',serif; font-size:2.5vh; color:#e6d7c2; line-height:1.9}
+.trs{margin:2vh 0} .trs .lab{font-family:'Song Myung',serif; font-size:3.4vh; color:var(--gold2); letter-spacing:.3vh} .trs .tm{font-family:'Cinzel',serif; font-size:9vh; color:var(--gold2); text-shadow:0 0 3vh rgba(201,164,92,.4); min-height:10vh}
+.tr .trh{display:flex; gap:5vw; margin-top:1vh; font-size:2.4vh; color:var(--mute)} .tr .trh > div{display:flex; flex-direction:column; align-items:center; gap:.6vh}
+.tr .trh .s{font-size:5vh; color:#efe4d6} .tr .trh .red .s{color:var(--red2)} .tr .trh .ok{color:var(--gold2)}
+.trb{display:grid; grid-template-columns:repeat(4, 1fr); gap:2.4vw; width:100%; max-width:90vw; margin-top:3vh}
+.trc{border-top:1px solid var(--gold); padding:2vh 1vw; text-align:left; animation:fade 1.4s ease both}
+.trc:nth-child(2){animation-delay:.6s} .trc:nth-child(3){animation-delay:1.2s} .trc:nth-child(4){animation-delay:1.8s}
+.trc .s{font-size:6vh; text-align:center; color:#efe4d6} .trc.red .s{color:var(--red2)} .trc .n{text-align:center; font-family:'Song Myung',serif; font-size:3vh; color:var(--gold2); margin-bottom:1.6vh}
+.trc .qa{display:grid; grid-template-columns:2.4vh 1fr; gap:.2vh .8vw; margin:1vh 0; font-size:1.8vh; color:var(--mute)} .trc .qa b{grid-column:2; color:#efe4d6; font-weight:600; font-size:2.1vh}
+.trc .qa i{font-style:normal; grid-row:span 2; font-size:2.6vh} .trc .qa i.ok{color:#9fd8a8} .trc .qa i.no{color:#ff6b78}
+.trc .coin{margin-top:2vh; text-align:center; font-family:'Cinzel',serif; font-size:7vh; color:var(--gold2); text-shadow:0 0 3vh rgba(201,164,92,.5)} .trc .coin small{font-family:'Noto Serif KR',serif; font-size:2vh; margin-left:.6vw; color:var(--mute)}
 .a1{position:relative}
 #deco{position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden; transition:opacity 1s}
 .a1c{position:absolute} .a1c .ring{width:100%; height:100%; filter:drop-shadow(0 0 2vh rgba(201,164,92,.18))}
@@ -187,12 +198,14 @@ h1 .red{color:var(--red2)}
 <div class="dot" id="dot"></div>
 <audio id="a0" preload="auto"></audio><audio id="a1" preload="auto"></audio>
 <script type="module">
+import { trialStep, houseAnswer, cardLabel, whyLabel, badLabel } from './net.js';
 import { connect, login, LOGIN_CSS, envelopeOn, ENVELOPE_MS, CARD_MS, openingCardStart, openingPageNow, publishKeys, PHASE_NAME, PHASE_CH, STORY_MIN, HOUSES, pIdx, atToday, autoAdvance, nextEntry, fmtClock, fmtLeft, esc, md } from './net.js';
 document.head.append(Object.assign(document.createElement('style'), {textContent: LOGIN_CSS}));
 const $ = s => document.querySelector(s);
 const N = await connect();
 await login(N, 'host', '무대 화면');
 
+let trial = {};
 let st = {}, cfg = {}, players = {}, host = {}, npc = {}, votes = {}, thoughts = [], opening = [];
 try{ opening = await (await fetch('opening.json')).json(); }catch(e){}
 
@@ -256,7 +269,7 @@ const INTERIORS = {
     + `<circle r="20" fill="none" stroke="${GOLD}" stroke-width=".35"/><circle r="17" fill="none" stroke="${GOLD}" stroke-width=".2" stroke-dasharray=".6 1.2"/>`,
   // open skeleton wheels with a turning latin inscription
   skeleton: id => `<g opacity=".5">${skelGear(0, 0, 47, 48, 900, false, .3)}</g>`
-    + inscription(id + 'i', 57, 'TEMPUS EDAX RERUM · ULTIMA FORSAN · MEMENTO HORAE · VULNERANT OMNES · ', 6.2, 420, true)
+    + inscription(id + 'i', 57, 'TEMPUS EDAX RERUM   ULTIMA FORSAN   MEMENTO HORAE   VULNERANT OMNES   ', 6.2, 420, true)
     + `<circle r="62" fill="none" stroke="${GOLD}" stroke-width=".4"/><circle r="52" fill="none" stroke="${GOLD}" stroke-width=".4"/>`
     + deepGear(...pol(48, 58), 15, 16, 70, true) + deepGear(...pol(66, 41), 9, 11, 42)
     + deepGear(...pol(208, 57), 19, 20, 90) + deepGear(...pol(236, 37), 10, 12, 50, true)
@@ -300,7 +313,7 @@ function internalGear(rIn, teeth, depth){   // a ring gear: teeth point inward
   for(let i = 0; i < n; i++){ const a = i / n * Math.PI * 2, q = i % 4, rr = (q === 1 || q === 2) ? rIn : rIn + depth; pts.push(f2(rr * Math.cos(a)) + ' ' + f2(rr * Math.sin(a))); }
   return 'M' + pts.join('L') + 'Z';
 }
-function movement({ hands = false, speed = 300, inner = .78, cards = false, text = 'TEMPUS · EDAX · RERUM · ULTIMA · FORSAN · MEMENTO · HORAE · VULNERANT · OMNES · ULTIMA · NECAT ·' } = {}){
+function movement({ hands = false, speed = 300, inner = .78, cards = false, text = 'TEMPUS  EDAX  RERUM  ULTIMA  FORSAN  MEMENTO  HORAE  VULNERANT  OMNES  ULTIMA  NECAT  ' } = {}){
   const id = 'mv' + (++ringId), g = id + 'g', vg = id + 'v';
   const ticks = Array.from({length: 120}, (_, i) => `<line x1="0" y1="-96" x2="0" y2="${i % 10 ? (i % 2 ? -94.6 : -93.6) : -91.5}" stroke="${GOLD}" stroke-width="${i % 10 ? .3 : .8}" transform="rotate(${i*3})"/>`).join('');
   const nums = ROM.map((n, i) => `<text x="0" y="-81.5" font-family="Cinzel, serif" font-size="11" font-weight="600" fill="url(#${g})" text-anchor="middle" dominant-baseline="middle" transform="rotate(${i*30})">${n}</text>`).join('');
@@ -354,8 +367,8 @@ const CARDS = {
   mid:     ['INTERLUDE', 'Interlude', '중간 이벤트 발생', '붉은 토끼가 시계를 살펴봅니다'],
   trial:   ['THE TRIAL', 'The Trial', '자정의 재판', '가문마다 뜻을 모아 답하십시오'],
   opening: ['PROLOGUE', 'Prologue', '백 년 전의 밤', '붉은 토끼가 이야기를 시작합니다'],
-  act1:    ['ACT · I', 'Act One', '4문양 화합의 만찬', '네 문양이 한자리에 모이면, 경계의 문이 열립니다'],
-  act2:    ['ACT · II', 'Act Two', '오래된 기억을 모아', '강가의 망자들이 기억을 팔기 시작합니다'],
+  act1:    ['ACT I', 'Act One', '4문양 화합의 만찬', '네 문양이 한자리에 모이면, 경계의 문이 열립니다'],
+  act2:    ['ACT II', 'Act Two', '오래된 기억을 모아', '강가의 망자들이 기억을 팔기 시작합니다'],
 };
 // ending text: break lines where a reader would pause
 function poem(h){
@@ -386,11 +399,16 @@ function bellStrike(A, dest, t, vol = 1, base = 196, ds = 1){
 let bellBus = null;
 // 'peal': a bright church peal (six bells rung down the scale, twice); 'midnight': six high strikes for the twelve o'clock
 const PEAL = [880, 784, 698, 659, 587, 523];
-// the interlude and the last bell ring a real church bell recording; the music dips while it rings
-const BELL_REC = new Audio('sfx/church-bell.mp3'); BELL_REC.preload = 'auto';
-function churchBell(){
-  try{ BELL_REC.pause(); BELL_REC.currentTime = 0; BELL_REC.volume = 1; BELL_REC.play().catch(() => {}); }catch(e){}
-  const el = A[ai]; if(el && !el.paused){ fadeTo(el, (cfg.volume ?? .7) * .3, 400); setTimeout(() => { if(A[ai] === el) fadeTo(el, cfg.volume ?? .7, 4000); }, 18000); }
+// the interlude, the last bell and the verdict ring the real church bell recording (sfx/church-bell.mp3), played through the same
+// unlocked audio context as everything else (so the browser can't block it) and loud over the music, which dips while it rings
+let bellBuf = null;
+const bellLoad = () => bellBuf || (bellBuf = fetch('sfx/church-bell.mp3').then(r => r.arrayBuffer()).then(b => new Promise((ok, no) => AC.decodeAudioData(b, ok, no))).catch(e => { bellBuf = null; throw e; }));
+bellLoad().catch(() => {});
+async function churchBell(){
+  if(!bellBus){ const c = AC.createDynamicsCompressor(); c.threshold.value = -8; c.ratio.value = 4; bellBus = AC.createGain(); bellBus.gain.value = 1.5; bellBus.connect(c); c.connect(AC.destination); }
+  let buf; try{ if(AC.state === 'suspended') await AC.resume(); buf = await bellLoad(); }catch(e){ bell('midnight'); return; }   // file missing: fall back to the drawn bell
+  const src = AC.createBufferSource(), g = AC.createGain(); src.buffer = buf; g.gain.value = 1.3; src.connect(g); g.connect(bellBus); src.start();
+  const el = A[ai]; if(el && !el.paused){ fadeTo(el, (cfg.volume ?? .7) * .3, 400); setTimeout(() => { if(A[ai] === el) fadeTo(el, cfg.volume ?? .7, 4000); }, Math.min(buf.duration, 22) * 1000); }
 }
 function bell(kind = 'peal'){
   if(!bellBus){ const c = AC.createDynamicsCompressor(); c.threshold.value = -8; c.ratio.value = 4; bellBus = AC.createGain(); bellBus.gain.value = 1.5; bellBus.connect(c); c.connect(AC.destination); }
@@ -499,7 +517,7 @@ const members = () => Object.values(players).filter(p => p && p.house);
 const has = (p, ch) => (p.opened || '').split(',').includes(ch);
 function houseBars(chs){
   return `<div class="houses">${HOUSES.map(h => { const ps = members().filter(p => p.house === h.k);
-    return `<div class="hc ${h.red ? 'red' : ''}"><div class="s">${h.s}</div><div class="n">${h.n} 가문 · ${ps.length}명</div>${chs.map(([ch, lab]) => {
+    return `<div class="hc ${h.red ? 'red' : ''}"><div class="s">${h.s}</div><div class="n">${h.n} 가문 ${ps.length}명</div>${chs.map(([ch, lab]) => {
       const n = ps.filter(p => has(p, ch)).length, pct = ps.length ? n / ps.length * 100 : 0;
       return `<div class="bar"><span>${lab}</span><i><b style="width:${pct}%"></b></i><em>${n}</em></div>`; }).join('')}</div>`; }).join('')}</div>`;
 }
@@ -512,7 +530,7 @@ function render(){
   let html = '', key = ph + '#' + dataVer;
   const ch = PHASE_CH[ph];
   if(ph === 'arrive'){
-    html = `<div class="scene lobby big">${lobbyClock()}<div class="txt"><div class="k">ONE MINUTE TO MIDNIGHT · FOR A HUNDRED YEARS</div><div class="t">Tea at the Boundary</div><div class="ko">경계의 정원 만찬</div></div></div>`;
+    html = `<div class="scene lobby big">${lobbyClock()}<div class="txt"><div class="k">ONE MINUTE TO MIDNIGHT, FOR A HUNDRED YEARS</div><div class="t">Tea at the Boundary</div><div class="ko">경계의 정원 만찬</div></div></div>`;
   } else if(envelopeOn(st, N.now())){
     html = `<div class="scene lobby cards">${envClock()}<div class="txt env"><div class="k">BEFORE THE STORY BEGINS</div><div class="t">Open your<br>Envelope</div><div class="ko">봉투를 열어 주십시오</div>
       <div class="s2">초대장 카드와 가문 설정서를 꺼내, 우리 가문의 설정서를 읽어 주십시오.<br>다른 가문에는 보여 주지 마십시오.</div></div></div>`;
@@ -525,14 +543,14 @@ function render(){
     const i = Math.max(0, Math.min(opening.length - 1, openingPageNow(st, cfg, N.now()))), pg = opening[i]; key += i;
     clearTimeout(cardT); cardT = setTimeout(render, 1000);
     const cls = {b:'', p:'pen', w:'wel', c:'clo'};
-    html = pg ? `<div class="scene"><div class="op"><h2>${esc(pg.title)}</h2>${pg.blocks.map(([k, v]) => `<p class="${cls[k]}">${md(v)}</p>`).join('')}<div class="pg">${opening.map((_, j) => j === i ? '♥' : '·').join(' ')}</div></div></div>` : '';
+    html = pg ? `<div class="scene"><div class="op"><h2>${esc(pg.title)}</h2>${pg.blocks.map(([k, v]) => `<p class="${cls[k]}">${md(v)}</p>`).join('')}<div class="pg">${opening.map((_, j) => j === i ? '♥' : '♡').join(' ')}</div></div></div>` : '';
   } else if(ph === 'act1'){
     // small clockworks turning here and there (alternate directions), and each house gets its own little dial
     decoWant = 'act1'; if($('#deco').dataset.k !== 'act1') $('#deco').innerHTML = [['-21vw', '-42vh', 66, .38, 1, 260], ['87vw', '66vh', 78, .36, -1, 320], ['85vw', '9vh', 24, .55, -1, 120], ['-2vw', '80vh', 20, .45, 1, 100], ['43vw', '-7vh', 14, .35, -1, 90], ['30vw', '90vh', 12, .3, 1, 80]]
       .map(([x, y, sz, op, dir, sp]) => `<div class="a1c" style="left:${x}; top:${y}; width:${sz}vh; height:${sz}vh; opacity:${op}">${dir < 0 ? backwards(() => movement({ speed: sp })) : movement({ speed: sp })}</div>`).join(''); $('#deco').dataset.k = 'act1';
     const doors = [['c2', '첫 번째 문'], ['c3', '두 번째 문'], ['c4', '시계가 잠든 자리']];
     const houses = HOUSES.map((h, k) => { const ps = members().filter(p => p.house === h.k);
-      const med = k % 2 ? backwards(() => movement({ speed: 140 + k * 20, text: 'TEMPUS · EDAX · RERUM · ULTIMA · FORSAN ·' })) : movement({ speed: 140 + k * 20, text: 'TEMPUS · EDAX · RERUM · ULTIMA · FORSAN ·' });
+      const med = k % 2 ? backwards(() => movement({ speed: 140 + k * 20, text: 'TEMPUS  EDAX  RERUM  ULTIMA  FORSAN  ' })) : movement({ speed: 140 + k * 20, text: 'TEMPUS  EDAX  RERUM  ULTIMA  FORSAN  ' });
       return `<div class="a1h ${h.red ? 'red' : ''}"><div class="med">${med}<div class="s">${h.s}</div></div><div class="n">${h.n} 가문<small>${ps.length}명</small></div>
         ${doors.map(([ch, lab], d) => { const n = ps.filter(p => has(p, ch)).length, pct = ps.length ? n / ps.length * 100 : 0;
           const shown = d === 0 || members().some(p => has(p, doors[d - 1][0]));
@@ -560,7 +578,26 @@ function render(){
   } else if(ph === 'mid'){
     html = `<div class="scene"><div class="act">Interlude</div><div class="actko">시간의 <span class="red">비밀</span></div><div class="murm">${(host.midmurmurs || []).map((l, i) => `<p style="animation-delay:${1.5 + i * 4}s">${esc(l)}</p>`).join('')}</div></div>`;
   } else if(ph === 'trial'){
-    html = `<div class="scene"><div class="act">The Trial</div><div class="actko">자정의 <span class="red">재판</span></div><div class="murm">${(host.murmurs || []).map((l, i) => `<p style="animation-delay:${1.5 + i * 4}s">${esc(l)}</p>`).join('')}</div></div>`;
+    const R = st.trialResult, [step] = trialStep(st, N.now()), props = Object.values(trial.props || {});
+    if(R){   // the verdict board: each house's answer, right or wrong, and the coins it earns
+      const mk = ok => `<i class="${ok ? 'ok' : 'no'}">${ok ? '✓' : '✗'}</i>`;
+      html = `<div class="scene tr"><div class="act" style="font-size:9vh">The Verdict</div><div class="actko">자정의 재판 <span class="red">결과</span></div>
+        <div class="trb">${HOUSES.map(h => { const g = (R.houses || {})[h.k] || {};
+          return `<div class="trc ${h.red ? 'red' : ''}"><div class="s">${h.s}</div><div class="n">${h.n} 가문</div>
+            <div class="qa">${mk(g.q1)}<span>인간은</span><b>${esc(cardLabel(g))}</b></div>
+            <div class="qa">${mk(g.q2)}<span>숨긴 이유</span><b>${esc(whyLabel(g))}</b></div>
+            <div class="qa">${mk(g.q3)}<span>가장 큰 잘못</span><b>${esc(badLabel(g))}</b></div>
+            <div class="coin">+${g.coins || 0}<small>동전</small></div></div>`; }).join('')}</div></div>`;
+      key += '|res|' + R.at;
+    } else {
+      const lab = { wait: '곧 시작합니다', prop: '각자 의견을 내십시오', agree: '가문 안에서 투표하십시오', closed: '붉은 토끼의 판결을 기다리는 중' }[step];
+      html = `<div class="scene tr"><div class="act">The Trial</div><div class="actko">자정의 <span class="red">재판</span></div>
+        <div class="trq"><p>인간은 누구인가?</p><p>인간은 왜 시계를 숨겼는가?</p><p>백 년 전 그 밤, 가장 큰 잘못을 한 가문은?</p></div>
+        <div class="trs"><div class="lab">${lab}</div><div class="tm" id="trT"></div></div>
+        <div class="trh">${HOUSES.map(h => { const n = props.filter(p => p.house === h.k).length, v = Object.values(trial.votes || {}).filter(x => x && x.house === h.k).length;
+          return `<div class="${h.red ? 'red' : ''}"><span class="s">${h.s}</span><span>의견 ${n}</span><span class="${v ? 'ok' : ''}">${step === 'agree' || step === 'closed' ? '투표 ' + v : ''}</span></div>`; }).join('')}</div></div>`;
+      key += '|trial|' + step + '|' + props.length + '|' + Object.keys(trial.votes || {}).length;
+    }
   } else if(ph === 'act2'){
     const sold = g => Object.values((npc[g] || {}).sales || {}).length;
     const gname = g => g === 'cat' ? '체셔 고양이' : '모자 장수';
@@ -582,7 +619,7 @@ function render(){
       setWatch(sameShell || lastMin == null ? min : lastMin); requestAnimationFrame(() => { w.querySelectorAll('.hand').forEach(h => h.style.transition = ''); setWatch(min); }); }
     const op = $('.op'); if(op){ let f = 1.15; op.style.setProperty('--fs', f); while(f > .5 && op.scrollHeight > $('#main').clientHeight){ f -= .03; op.style.setProperty('--fs', f); } }
     const mem = $('.memory'); if(mem){ let f = 1.1; mem.style.setProperty('--fs', f); while(f > .5 && mem.scrollHeight > $('#main').clientHeight - 60){ f -= .04; mem.style.setProperty('--fs', f); } }
-    if(ph === 'end' && st.stageScene === 'ending' && st.verdict){ if(!rang){ rang = true; setTimeout(() => { setWatch(720); bell('midnight'); }, 1200); } else setWatch(720); } else rang = false;
+    if(ph === 'end' && st.stageScene === 'ending' && st.verdict){ if(!rang){ rang = true; setTimeout(() => { setWatch(720); churchBell(); }, 1200); } else setWatch(720); } else rang = false;
   }
   if(!decoWant && $('#deco').dataset.k){ $('#deco').innerHTML = ''; $('#deco').dataset.k = ''; }
   syncBgm();
@@ -593,13 +630,15 @@ function tick(){
   $('#next').innerHTML = nx ? `${esc(nx.label)}까지<b>${fmtLeft(nx.t - now)}</b>` : '';
 }
 let lastPhase = null;
-N.on('state', v => { st = v || {}; if(lastPhase && st.phase !== lastPhase && PHASE_CH[st.phase] && st.phase !== 'act2'){ if(st.phase === 'mid' || st.phase === 'end') churchBell(); else bell('peal'); } lastPhase = st.phase; render(); publishKeys(N, st, host.keys);
+N.on('state', v => { st = v || {}; if(lastPhase && st.phase !== lastPhase && PHASE_CH[st.phase] && st.phase !== 'act2'){ churchBell(); } lastPhase = st.phase; render(); publishKeys(N, st, host.keys);
   const m = st.stageMsg; clearTimeout(annT); document.querySelectorAll('.ann').forEach(x => x.remove());
   if(m && m.text && N.now() - m.at < 20000){ const a = document.createElement('div'); a.className = 'ann'; a.innerHTML = `<div><small>From the Red Hare</small><p>${esc(m.text).replace(/\n/g, '<br>')}</p></div>`; document.body.append(a); annT = setTimeout(() => a.remove(), Math.max(1000, 20000 - (N.now() - m.at))); } });
 N.on('config', v => { cfg = v || {}; render(); prefetchUploads(); });
 N.on('players', v => { players = v || {}; render(); });
 N.on('npc', v => { npc = v || {}; render(); });
 N.on('votes', v => { votes = v || {}; render(); });
+N.on('trial', v => { trial = v || {}; render(); });
+setInterval(() => { const t = $('#trT'); if(!t) return; const [step, left] = trialStep(st, N.now()); t.textContent = left ? fmtLeft(left) : ''; if(t.dataset.s && t.dataset.s !== step) render(); t.dataset.s = step; }, 500);
 // thoughts: new ones float up first, then the old ones keep drifting by
 const fresh = []; let seenT = 0, cyc = 0, big = 0;
 N.on('thoughts', v => { const arr = Object.values(v || {}).filter(t => t && t.text).sort((a, b) => a.at - b.at); if(arr.length < seenT) seenT = 0; fresh.push(...arr.slice(seenT)); seenT = arr.length; thoughts = arr; });
