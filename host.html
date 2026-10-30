@@ -35,6 +35,8 @@ textarea{width:100%; min-height:64px; resize:vertical}
 .phases{display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; margin:10px 0}
 .phases button{padding:8px 4px; font-size:12.5px}
 .tt{width:100%; border-collapse:collapse; font-size:13.5px}
+.pl summary{cursor:pointer; color:var(--gold2); max-width:340px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap} .pl .pll{display:flex; flex-direction:column; gap:3px; padding:6px 0 4px 6px; max-height:220px; overflow:auto}
+.pl label{display:flex; gap:6px; align-items:center; font-size:12.5px}
 .tt td{padding:5px 4px; border-bottom:1px solid rgba(201,164,92,.12); vertical-align:middle}
 .tt td:first-child{color:var(--gold2); white-space:nowrap} .tt tr.cur td{background:rgba(179,27,43,.15)}
 .tt select{max-width:150px} .tt input[type=time]{width:96px}
@@ -95,7 +97,7 @@ ul.ans{margin:0; padding-left:18px; font-size:13.5px} ul.ans li{margin:3px 0}
     <div class="row"><select id="ovr" style="flex:1"></select><button id="ovrBtn">지금 이 곡 틀기</button></div>
     <div class="row"><button id="ovrOff">타임테이블대로 돌아가기</button></div>
     <div class="row"><input type="file" id="upFile" accept="audio/*,.mp3,.m4a,.wav,.ogg" multiple style="flex:1; min-width:0"><button class="pri" id="upBtn">음악 올리기</button></div>
-    <div class="muted" id="upMsg">여기서 올린 곡은 바로 위 "곡 고르기"와 타임테이블 BGM 칸에 ⬆ 표시로 나타납니다. 한 곡 15MB 이하. 소리는 무대 화면(TV)에서만 나옵니다.</div>
+    <div class="muted" id="upMsg">여기서 올린 곡은 바로 위 "곡 고르기"와 타임테이블 BGM 칸에 ⬆ 표시로 나타납니다. 타임테이블 BGM 칸을 누르면 단계마다 여러 곡을 고를 수 있고, 고른 곡들을 섞어서 차례로 이어 틉니다(끝까지 돌면 다시 섞음). 한 곡 15MB 이하. 소리는 무대 화면(TV)에서만 나옵니다.</div>
     <div id="upList"></div>
   </section>
 
@@ -179,10 +181,31 @@ const TODO = {
 };
 const SC_ORDER = ['memory', 'vote', 'ending', 'thoughts'];
 function renderTodo(){
-  const p = st.phase || 'arrive', [what, how, nxt, note] = TODO[p] || ['', '', ''], seg = (cfg.schedule || {})[PHASES[pIdx(p) + 1]] || {};
-  const auto = how === 'auto' && seg.auto !== false && st.auto !== false;
-  const next = !nxt ? '' : auto ? `<span class="a">자동</span> ${esc(seg.time || '')}에 "${nxt}"(으)로 저절로 넘어갑니다.` : `<span class="m">손으로</span> ${note ? esc(note) : '"다음 단계 ▸"를 눌러야 "' + nxt + '"(으)로 넘어갑니다.'}`;
-  $('#todo').innerHTML = `<b>지금 할 일</b> ${esc(what)}${next ? '<br><b>다음</b> ' + next : ''}`;
+  const p = st.phase || 'arrive', [what, how, nxt, note] = TODO[p] || ['', '', ''], seg = (cfg.schedule || {})[PHASES[pIdx(p) + 1]] || {}, now = N.now();
+  const at = seg.time ? atToday(seg.time, now) : 0, left = at > now ? fmtLeft(at - now) : '곧';
+  let next = '';
+  if(nxt){
+    if(how !== 'auto' || seg.auto === false) next = `<span class="m">손으로</span> ${note ? esc(note) : '"다음 단계 ▸"를 눌러야 "' + nxt + '"(으)로 넘어갑니다.'}`;
+    else if(st.auto === false) next = `<span class="m">일시정지 중</span> 지금은 저절로 넘어가지 않습니다. "▶ 자동 진행 재개"를 누르거나 "다음 단계 ▸"로 넘기세요. (원래 예정 ${esc(seg.time)}, 남은 시간 <b>${left}</b>)`;
+    else next = `<span class="a">자동</span> ${esc(seg.time)}에 "${nxt}"(으)로 저절로 넘어갑니다. 남은 시간 <b>${left}</b>`;
+  }
+  // what the stage is showing right now, and for how long
+  const since = now - (st.phaseAt || 0), sec = ms => Math.max(0, Math.ceil(ms / 1000)) + '초';
+  let stage = '';
+  if(p === 'opening'){
+    if(envelopeOn(st, now)) stage = `"봉투를 열어 주십시오" 화면, 남은 시간 <b>${fmtLeft(openingStoryStart(st) - CARD_MS - now)}</b>`;
+    else if(now < openingStoryStart(st)) stage = `Prologue 화면, <b>${sec(openingStoryStart(st) - now)}</b> 뒤 이야기 1장`;
+    else { const pg = openingPageNow(st, cfg, now), per = pageSec(cfg) * 1000, from = Math.max(openingStoryStart(st), st.openingPageAt || 0);
+      stage = `이야기 ${pg + 1} / 3장` + (pg < 2 ? `, 다음 장까지 <b>${sec(per - ((now - from) % per))}</b>` : ', 마지막 장'); }
+  } else if(['act1', 'mid', 'act2', 'trial'].includes(p) && since < CARD_MS) stage = `단계 제목 화면, <b>${sec(CARD_MS - since)}</b> 남음`;
+  if(p === 'mid'){ const n = (host.midmurmurs || []).length, end = CARD_MS + (1.5 + n * 4 + 2) * 1000;
+    stage += (stage ? ' > ' : '') + (since < end ? `요괴들의 웅성거림 ${n}줄이 4초마다 하나씩, 끝나기까지 <b>${sec(end - since)}</b>` : '웅성거림이 모두 떴습니다'); }
+  if(p === 'mid' && since < 31000) stage += ' (교회 종소리 약 30초)';
+  if(p === 'trial'){ const n = (host.murmurs || []).length, end = CARD_MS + (1.5 + n * 4 + 2) * 1000;
+    stage += (stage ? ' > ' : '') + (since < end ? `재판 웅성거림 ${n}줄, 끝나기까지 <b>${sec(end - since)}</b>` : '웅성거림이 모두 떴습니다'); }
+  if(p === 'end' && !st.stageScene) stage = '"자정의 종" 화면' + (since < 31000 ? `, 교회 종소리 <b>${sec(31000 - since)}</b> 남음` : '') + '. 이제 ① 인간의 기억을 누르세요.';
+  $('#todo').innerHTML = `<b>지금 할 일</b> ${esc(what)}${stage ? '<br><b>무대</b> ' + stage : ''}${next ? '<br><b>다음</b> ' + next : ''}`;
+  $('#nextP').textContent = '다음 단계 ▸' + (nxt && how === 'auto' && seg.auto !== false && st.auto !== false && at > now ? ` (자동 ${left})` : '');
   const i = SC_ORDER.indexOf(st.stageScene || ''), want = p === 'end' ? SC_ORDER[i + 1] : null;
   document.querySelectorAll('[data-sc]').forEach(b => b.classList.toggle('next', b.dataset.sc === want));
 }
@@ -227,7 +250,7 @@ $('#stageClear').onclick = () => setState({ stageMsg: null });
 // ---------- bgm ----------
 // tracks = files in the site's bgm folder + songs uploaded from this panel (stored in the database, played by the stage)
 const allTracks = () => [...tracks, ...Object.entries(cfg.uploads || {}).sort((a, b) => (a[1].at || 0) - (b[1].at || 0)).map(([k, u]) => ({ file: 'up:' + k, name: '⬆ ' + u.name }))];
-const trackName = f => (allTracks().find(t => t.file === f) || {}).name || f || '없음';
+const trackName = f => (f || '').split('|').filter(Boolean).map(x => (allTracks().find(t => t.file === x) || {}).name || x).join(', ') || '없음';
 function fillTracks(sel, val, none){ sel.innerHTML = `<option value="">${none}</option>` + allTracks().map(t => `<option value="${esc(t.file)}">${esc(t.name)}</option>`).join(''); sel.value = val || ''; }
 $('#bgmPlay').onclick = () => setState({ bgmPlaying: st.bgmPlaying === false });
 $('#vol').oninput = e => N.update('config', { volume: Number(e.target.value) });
@@ -277,14 +300,15 @@ function renderTT(){
     return `<tr class="${p === st.phase ? 'cur' : ''}" data-p="${p}"><td>${esc(e.label || PHASE_NAME[p])}</td>
       <td><input type="time" value="${esc(e.time)}" data-k="time"></td>
       <td><label><input type="checkbox" data-k="auto" ${e.auto ? 'checked' : ''}> <span class="how ${e.auto ? 'a' : 'm'}">${e.auto ? '자동으로 넘어감' : '손으로 넘김'}</span></label></td>
-      <td><select data-k="bgm"></select></td></tr>`; }).join('');
-  if(document.activeElement && $('#tt').contains(document.activeElement)) return;
+      <td><details class="pl"><summary>${(e.bgm || '').split('|').filter(Boolean).length ? esc(trackName(e.bgm)) : '음악 없음'}</summary><div class="pll">${allTracks().map(t => `<label><input type="checkbox" data-k="bgm" value="${esc(t.file)}" ${(e.bgm || '').split('|').includes(t.file) ? 'checked' : ''}> ${esc(t.name)}</label>`).join('') || '<span class="muted">올린 곡이 없습니다</span>'}</div></details></td></tr>`; }).join('');
+  if(document.activeElement && $('#tt').contains(document.activeElement) && document.activeElement.type !== 'checkbox') return;
+  const openPl = [...$('#tt').querySelectorAll('tr[data-p] details[open]')].map(d => d.closest('tr').dataset.p);
   $('#tt').innerHTML = '<tr><td class="muted">단계</td><td class="muted">시작</td><td class="muted">넘어가는 방법</td><td class="muted">BGM</td></tr>' + rows;
-  $('#tt').querySelectorAll('tr[data-p]').forEach(tr => fillTracks(tr.querySelector('select'), S[tr.dataset.p].bgm, '음악 없음'));
+  openPl.forEach(p => { const d = $('#tt').querySelector(`tr[data-p="${p}"] details`); if(d) d.open = true; });
   if(document.activeElement !== $('#opSec')) $('#opSec').value = pageSec(cfg);
 }
 $('#tt').onchange = e => { const tr = e.target.closest('tr'); if(!tr) return; const k = e.target.dataset.k;
-  const v = k === 'auto' ? e.target.checked : e.target.value; N.update('config/schedule/' + tr.dataset.p, { [k]: v }); toast('저장했습니다'); };
+  const v = k === 'auto' ? e.target.checked : k === 'bgm' ? [...tr.querySelectorAll('input[data-k="bgm"]:checked')].map(c => c.value).join('|') : e.target.value; N.update('config/schedule/' + tr.dataset.p, { [k]: v }); toast('저장했습니다'); };
 const shift = d => { const now = N.now(), S = cfg.schedule || {}, up = {};
   for(const [p, e] of Object.entries(S)){ const t = atToday(e.time, now); if(t > now){ const n = new Date(t + d * 60e3); up[p + '/time'] = String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0'); } }
   if(Object.keys(up).length){ N.update('config/schedule', up); toast('아직 안 온 일정을 ' + (d > 0 ? d + '분 미뤘습니다' : (-d) + '분 당겼습니다')); } };
@@ -362,7 +386,7 @@ $('#wipe').onclick = async () => { if(!confirm('게임 기록을 모두 지울�
   await N.update('state', { phase: 'arrive', phaseAt: N.now(), stageScene: '', showSpell: false, stageMsg: null, openingPage: 0, openingPageAt: 0, opGoAt: 0, open: null, verdict: null, voteOpen: false }); toast('초기화했습니다'); };
 
 // ---------- live ----------
-function tick(){ const now = N.now(); $('#hClock').textContent = fmtClock(now); const nx = nextEntry(cfg.schedule, now, st.phase);
+function tick(){ renderTodo(); const now = N.now(); $('#hClock').textContent = fmtClock(now); const nx = nextEntry(cfg.schedule, now, st.phase);
   $('#hNext').innerHTML = nx ? `다음 <b>${esc(nx.label)}</b> ${fmtLeft(nx.t - now)}` : '다음 일정 없음'; }
 const all = () => { renderTally(); renderPhase(); renderBgm(); renderTT(); renderPlayers(); renderNpc(); };
 N.on('state', v => { st = v || {}; all(); publishKeys(N, st, host.keys); });

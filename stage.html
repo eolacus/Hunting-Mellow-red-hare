@@ -74,6 +74,23 @@ h1 .red{color:var(--red2)}
 .op p.clo{text-align:center; text-indent:0; color:var(--red2); font-weight:700}
 .op .pg{text-align:center; color:var(--gold); letter-spacing:1vh; margin-top:2vh}
 /* houses */
+.a1{position:relative}
+#deco{position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden; transition:opacity 1s}
+.a1c{position:absolute} .a1c .ring{width:100%; height:100%; filter:drop-shadow(0 0 2vh rgba(201,164,92,.18))}
+.a1 .act{font-size:11vh} .a1 .actko{font-size:3.6vh}
+.a1rule{display:flex; align-items:center; gap:1.6vw; margin:2vh 0 1vh; color:var(--gold); font-size:2vh; letter-spacing:.3vh}
+.a1rule::before, .a1rule::after{content:""; width:14vw; height:1px; background:linear-gradient(90deg, transparent, var(--gold), transparent)}
+.a1rule .r{color:var(--red2)}
+.a1houses{display:grid; grid-template-columns:repeat(4, 1fr); gap:3vw; width:100%; max-width:86vw; margin-top:1.5vh}
+.a1h{display:flex; flex-direction:column; align-items:center}
+.a1h .med{position:relative; width:19vh; height:19vh} .a1h .med .ring{width:100%; height:100%}
+.a1h .med .s{position:absolute; inset:0; display:grid; place-items:center; font-size:6.4vh; color:#efe4d6; text-shadow:0 0 2vh #000} .a1h.red .med .s{color:var(--red2)}
+.a1h .n{font-family:'Song Myung',serif; font-size:3vh; letter-spacing:.3vh; margin:1.2vh 0 1vh; color:var(--gold2)} .a1h .n small{display:block; font-family:'Noto Serif KR',serif; font-size:1.7vh; letter-spacing:.1vh; color:var(--mute)}
+.a1h .dr.hid{visibility:hidden} .a1h .dr:not(.hid){animation:fade 1.6s ease both}
+.a1h .dr{display:flex; align-items:center; gap:.8vw; width:100%; font-size:1.75vh; color:var(--mute); margin:.6vh 0}
+.a1h .dr span{flex:0 0 8.6em; text-align:left} .a1h .dr i{flex:1; height:.35vh; background:rgba(201,164,92,.18); position:relative}
+.a1h .dr i b{position:absolute; inset:0 auto 0 0; background:linear-gradient(90deg, #8a6630, #f3d896); box-shadow:0 0 1vh rgba(243,216,150,.5); transition:width 1s}
+.a1h .dr em{flex:0 0 1.6em; font-style:normal; color:var(--gold2); text-align:right; font-family:'Cinzel',serif}
 .houses{display:grid; grid-template-columns:repeat(4, 1fr); gap:2vw; width:100%; max-width:88vw; margin-top:3vh}
 .hc{border-top:.3vh solid var(--gold); padding:2vh 1vw 1vh; background:linear-gradient(180deg, rgba(201,164,92,.10), transparent)}
 .hc .s{font-size:6vh; line-height:1} .hc.red .s{color:var(--red2)}
@@ -160,6 +177,7 @@ h1 .red{color:var(--red2)}
 <body>
 <div id="bg"></div>
 <canvas id="noise" width="320" height="180"></canvas>
+<div id="deco"></div>
 <div id="app">
   <header><div class="brand">Hunting Mellow <span class="r">Red</span> Hare</div><div class="now"><b id="clock">--:--</b><span id="phaseName"></span></div></header>
   <main id="main"></main>
@@ -167,7 +185,7 @@ h1 .red{color:var(--red2)}
 </div>
 <div id="floats"></div>
 <div class="dot" id="dot"></div>
-<audio id="a0" loop preload="auto"></audio><audio id="a1" loop preload="auto"></audio>
+<audio id="a0" preload="auto"></audio><audio id="a1" preload="auto"></audio>
 <script type="module">
 import { connect, login, LOGIN_CSS, envelopeOn, ENVELOPE_MS, CARD_MS, openingCardStart, openingPageNow, publishKeys, PHASE_NAME, PHASE_CH, STORY_MIN, HOUSES, pIdx, atToday, autoAdvance, nextEntry, fmtClock, fmtLeft, esc, md } from './net.js';
 document.head.append(Object.assign(document.createElement('style'), {textContent: LOGIN_CSS}));
@@ -368,6 +386,12 @@ function bellStrike(A, dest, t, vol = 1, base = 196, ds = 1){
 let bellBus = null;
 // 'peal': a bright church peal (six bells rung down the scale, twice); 'midnight': six high strikes for the twelve o'clock
 const PEAL = [880, 784, 698, 659, 587, 523];
+// the interlude and the last bell ring a real church bell recording; the music dips while it rings
+const BELL_REC = new Audio('sfx/church-bell.mp3'); BELL_REC.preload = 'auto';
+function churchBell(){
+  try{ BELL_REC.pause(); BELL_REC.currentTime = 0; BELL_REC.volume = 1; BELL_REC.play().catch(() => {}); }catch(e){}
+  const el = A[ai]; if(el && !el.paused){ fadeTo(el, (cfg.volume ?? .7) * .3, 400); setTimeout(() => { if(A[ai] === el) fadeTo(el, cfg.volume ?? .7, 4000); }, 18000); }
+}
 function bell(kind = 'peal'){
   if(!bellBus){ const c = AC.createDynamicsCompressor(); c.threshold.value = -8; c.ratio.value = 4; bellBus = AC.createGain(); bellBus.gain.value = 1.5; bellBus.connect(c); c.connect(AC.destination); }
   const t0 = AC.currentTime + .1; let len;
@@ -376,8 +400,8 @@ function bell(kind = 'peal'){
   const el = A[ai]; if(el && !el.paused){ const v = cfg.volume ?? .7; fadeTo(el, v * .3, 300); setTimeout(() => { if(A[ai] === el) fadeTo(el, cfg.volume ?? .7, 2500); }, len * 1000); }
 }
 const A = [$('#a0'), $('#a1')]; let ai = 0, curTrack = null;
-function fadeTo(el, vol, ms){ const from = el.volume, t0 = performance.now();
-  const step = () => { const k = Math.min(1, (performance.now() - t0) / ms); el.volume = Math.max(0, Math.min(1, from + (vol - from) * k)); if(k < 1) requestAnimationFrame(step); else if(vol === 0) el.pause(); };
+function fadeTo(el, vol, ms){ const from = el.volume, t0 = performance.now(), id = el._fade = (el._fade || 0) + 1;   // a newer fade on the same player cancels this one
+  const step = () => { if(el._fade !== id) return; const k = Math.min(1, (performance.now() - t0) / ms); el.volume = Math.max(0, Math.min(1, from + (vol - from) * k)); if(k < 1) requestAnimationFrame(step); else if(vol === 0) el.pause(); };
   requestAnimationFrame(step); }
 // songs uploaded from the host panel live in the database as base64 pieces; fetch once, keep as a local blob
 const upCache = {};
@@ -390,17 +414,30 @@ function upUrl(key){
   return upCache[key];
 }
 async function prefetchUploads(){ for(const k of Object.keys(cfg.uploads || {})) await upUrl(k); }
+// a phase may have several songs ("a|b|c"): they play one after another in a shuffled order, crossfading, and reshuffle at the end
+let plist = [], pidx = 0, ptoken = 0;
+const shuffle = (a, avoid) => { a = a.slice(); for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  if(a.length > 1 && a[0] === avoid) [a[0], a[1]] = [a[1], a[0]]; return a; };
+function playIdx(){
+  const f = plist[pidx], tok = ++ptoken; if(!f) return;
+  fadeTo(A[ai], 0, 2000); ai = 1 - ai; const el = A[ai]; el.loop = plist.length === 1; el._adv = false;
+  const go = src => { if(tok !== ptoken || !src) return; el.src = src; el.volume = 0; el.play().catch(() => {}); fadeTo(el, cfg.volume ?? .7, 2200); };
+  if(f.startsWith('up:')) upUrl(f.slice(3)).then(go); else go('bgm/' + f);
+  N.set('stage/nowPlaying', f).catch(() => {});
+}
+function nextSong(){ if(plist.length < 2) return; pidx++; if(pidx >= plist.length){ plist = shuffle(plist, plist[plist.length - 1]); pidx = 0; } playIdx(); }
+A.forEach(el => {
+  el.addEventListener('timeupdate', () => { if(el !== A[ai] || el._adv || plist.length < 2 || !el.duration) return; if(el.duration - el.currentTime < 2.5){ el._adv = true; nextSong(); } });
+  el.addEventListener('ended', () => { if(el === A[ai] && !el._adv){ el._adv = true; nextSong(); } });
+});
 function syncBgm(){
   const vol = cfg.volume ?? .7, playing = st.bgmPlaying !== false;
   const seg = (cfg.schedule || {})[st.phase] || {};
   const want = playing ? (cfg.bgmOverride || seg.bgm || '') : '';
   if(want !== curTrack){
-    fadeTo(A[ai], 0, 1800); curTrack = want;
-    if(want){ ai = 1 - ai; const el = A[ai];
-      const go = src => { if(curTrack !== want || !src) return; el.src = src; el.volume = 0; el.play().catch(() => {}); fadeTo(el, cfg.volume ?? .7, 2200); };
-      if(want.startsWith('up:')) upUrl(want.slice(3)).then(go); else go('bgm/' + want); }
-    N.set('stage/nowPlaying', want || '').catch(() => {});
-  } else if(want) A[ai].volume = vol;
+    curTrack = want; plist = shuffle(want.split('|').filter(Boolean)); pidx = 0;
+    if(plist.length) playIdx(); else { ++ptoken; fadeTo(A[ai], 0, 1800); N.set('stage/nowPlaying', '').catch(() => {}); }
+  } else if(want && !A[ai].paused) A[ai].volume = vol;
 }
 
 // ---------- the riverbank ghosts (original line drawings) ----------
@@ -468,7 +505,7 @@ function houseBars(chs){
 }
 let scene = '', annT = null, dataVer = 0, rang = false, cardT = null;
 function render(){
-  const ph = st.phase || 'arrive';
+  const ph = st.phase || 'arrive'; let decoWant = '';
   $('#phaseName').textContent = PHASE_NAME[ph] || '';
   $('#bg').className = ph === 'arrive' ? 'hallo' : ph === 'end' ? 'wonder faint' : envelopeOn(st, N.now()) ? 'wonder' : '';
   document.querySelector('.now').style.visibility = ph === 'arrive' ? '' : 'hidden'; $('#next').style.display = 'none';
@@ -490,8 +527,18 @@ function render(){
     const cls = {b:'', p:'pen', w:'wel', c:'clo'};
     html = pg ? `<div class="scene"><div class="op"><h2>${esc(pg.title)}</h2>${pg.blocks.map(([k, v]) => `<p class="${cls[k]}">${md(v)}</p>`).join('')}<div class="pg">${opening.map((_, j) => j === i ? '♥' : '·').join(' ')}</div></div></div>` : '';
   } else if(ph === 'act1'){
-    html = `<div class="scene"><div class="act">Act One</div><div class="actko">1막 · 4문양 화합의 만찬</div>
-      ${houseBars([['c2','첫 번째 문 통과'],['c3','두 번째 문 통과'],['c4','시계가 잠든 자리']])}</div>`;
+    // small clockworks turning here and there (alternate directions), and each house gets its own little dial
+    decoWant = 'act1'; if($('#deco').dataset.k !== 'act1') $('#deco').innerHTML = [['-21vw', '-42vh', 66, .38, 1, 260], ['87vw', '66vh', 78, .36, -1, 320], ['85vw', '9vh', 24, .55, -1, 120], ['-2vw', '80vh', 20, .45, 1, 100], ['43vw', '-7vh', 14, .35, -1, 90], ['30vw', '90vh', 12, .3, 1, 80]]
+      .map(([x, y, sz, op, dir, sp]) => `<div class="a1c" style="left:${x}; top:${y}; width:${sz}vh; height:${sz}vh; opacity:${op}">${dir < 0 ? backwards(() => movement({ speed: sp })) : movement({ speed: sp })}</div>`).join(''); $('#deco').dataset.k = 'act1';
+    const doors = [['c2', '첫 번째 문'], ['c3', '두 번째 문'], ['c4', '시계가 잠든 자리']];
+    const houses = HOUSES.map((h, k) => { const ps = members().filter(p => p.house === h.k);
+      const med = k % 2 ? backwards(() => movement({ speed: 140 + k * 20, text: 'TEMPUS · EDAX · RERUM · ULTIMA · FORSAN ·' })) : movement({ speed: 140 + k * 20, text: 'TEMPUS · EDAX · RERUM · ULTIMA · FORSAN ·' });
+      return `<div class="a1h ${h.red ? 'red' : ''}"><div class="med">${med}<div class="s">${h.s}</div></div><div class="n">${h.n} 가문<small>${ps.length}명</small></div>
+        ${doors.map(([ch, lab], d) => { const n = ps.filter(p => has(p, ch)).length, pct = ps.length ? n / ps.length * 100 : 0;
+          const shown = d === 0 || members().some(p => has(p, doors[d - 1][0]));
+          return `<div class="dr${shown ? '' : ' hid'}"><span>${lab}</span><i><b style="width:${pct}%"></b></i><em>${n}</em></div>`; }).join('')}</div>`; }).join('');
+    html = `<div class="scene a1"><div class="act">Act One</div><div class="actko">1막&nbsp;&nbsp;4문양 화합의 만찬</div>
+      <div class="a1rule"><span>♠</span><span class="r">♥</span><span class="r">♦</span><span>♣</span></div><div class="a1houses">${houses}</div></div>`;
     key += '|' + JSON.stringify(members().map(p => [p.house, p.opened]));
   } else if(ph === 'end' && st.stageScene === 'memory'){
     html = `<div class="scene"><div class="kicker">The Guest Remembers</div><div class="memory">${(host.memory || []).map((l, i) => `<p style="animation-delay:${1 + i * 5.5}s">${poem(esc(l))}</p>`).join('')}</div></div>`;
@@ -517,7 +564,7 @@ function render(){
   } else if(ph === 'act2'){
     const sold = g => Object.values((npc[g] || {}).sales || {}).length;
     const gname = g => g === 'cat' ? '체셔 고양이' : '모자 장수';
-    html = `<div class="scene river"><div class="whispers"></div><div class="act">Act Two</div><div class="actko">2막 · 오래된 기억을 모아</div><div class="sub">강가의 망자들이 기억을 팝니다</div>
+    html = `<div class="scene river"><div class="whispers"></div><div class="act">Act Two</div><div class="actko">2막&nbsp;&nbsp;오래된 기억을 모아</div><div class="sub">강가의 망자들이 기억을 팝니다</div>
       <div class="ghosts2">${['cat','hatter'].map(g => `<div class="gh2" data-g="${g}"><div class="bub"></div><img class="gimg" src="img/ghost_${g}.png" alt=""><div class="gn">${esc(gname(g))}</div><div class="gc">팔려 나간 기억 <b>${sold(g)}</b></div></div>`).join('')}</div><div class="tip"><b>Tip!</b> 정원에 누군가 흘리고 잊어버린 반짝이는 것이 있을지도 모릅니다. 경계의 정원은 매우 추우니 조심하세요.</div></div>`;
     key += '|' + sold('cat') + '/' + sold('hatter');
   } else if(ph === 'party'){
@@ -537,6 +584,7 @@ function render(){
     const mem = $('.memory'); if(mem){ let f = 1.1; mem.style.setProperty('--fs', f); while(f > .5 && mem.scrollHeight > $('#main').clientHeight - 60){ f -= .04; mem.style.setProperty('--fs', f); } }
     if(ph === 'end' && st.stageScene === 'ending' && st.verdict){ if(!rang){ rang = true; setTimeout(() => { setWatch(720); bell('midnight'); }, 1200); } else setWatch(720); } else rang = false;
   }
+  if(!decoWant && $('#deco').dataset.k){ $('#deco').innerHTML = ''; $('#deco').dataset.k = ''; }
   syncBgm();
 }
 function tick(){
@@ -545,7 +593,7 @@ function tick(){
   $('#next').innerHTML = nx ? `${esc(nx.label)}까지<b>${fmtLeft(nx.t - now)}</b>` : '';
 }
 let lastPhase = null;
-N.on('state', v => { st = v || {}; if(lastPhase && st.phase !== lastPhase && PHASE_CH[st.phase] && st.phase !== 'act2') bell('peal'); lastPhase = st.phase; render(); publishKeys(N, st, host.keys);
+N.on('state', v => { st = v || {}; if(lastPhase && st.phase !== lastPhase && PHASE_CH[st.phase] && st.phase !== 'act2'){ if(st.phase === 'mid' || st.phase === 'end') churchBell(); else bell('peal'); } lastPhase = st.phase; render(); publishKeys(N, st, host.keys);
   const m = st.stageMsg; clearTimeout(annT); document.querySelectorAll('.ann').forEach(x => x.remove());
   if(m && m.text && N.now() - m.at < 20000){ const a = document.createElement('div'); a.className = 'ann'; a.innerHTML = `<div><small>From the Red Hare</small><p>${esc(m.text).replace(/\n/g, '<br>')}</p></div>`; document.body.append(a); annT = setTimeout(() => a.remove(), Math.max(1000, 20000 - (N.now() - m.at))); } });
 N.on('config', v => { cfg = v || {}; render(); prefetchUploads(); });
